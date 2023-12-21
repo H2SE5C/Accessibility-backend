@@ -9,7 +9,7 @@ namespace Accessibility_app.Models
 		public int Id { get; set; }
 		public string Email { get; set; }
 		public string Wachtwoord { get; set; }
-		public string? Rol { get; set; } = null!;
+		public string? Rol { get; set; }
 		public DateTime LaatstIngelogd { get; set; } = DateTime.Now;
 		public bool Geverifieerd { get; set; }
 		public List<Bericht>? Berichten { get; set; } = new();
