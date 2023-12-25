@@ -2,10 +2,12 @@
 using Microsoft.Extensions.Options;
 using Accessibility_app.Models;
 using System.Reflection.Emit;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Accessibility_app.Data;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 {
 	public DbSet<Aandoening> Aandoeningen { get; set; }
 	public DbSet<Antwoord> Antwoorden { get; set; }
@@ -24,15 +26,16 @@ public class ApplicationDbContext : DbContext
 	public DbSet<Voogd> Voogden { get; set; }
 	public DbSet<Vraag> Vragen { get; set; }
 	public DbSet<Vragenlijst> Vragenlijsten { get; set; }
-	public ApplicationDbContext(DbContextOptions options)
-		: base(options){}
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    {
+    }
 
-	protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder builder)
 	{
 		base.OnModelCreating(builder);
 
 
-		builder.Entity<Gebruiker>()
+		/*builder.Entity<Gebruiker>()
 	   .HasMany(u => u.Berichten)
 	   .WithOne(b => b.Verzender)
 	   .HasForeignKey(b => b.VerzenderId)
@@ -45,7 +48,7 @@ public class ApplicationDbContext : DbContext
 			.HasOne(b => b.Ontvanger)
 			.WithMany()
 			.HasForeignKey(b => b.OntvangerId)
-			.OnDelete(DeleteBehavior.Restrict);
+			.OnDelete(DeleteBehavior.Restrict);*/
 	}
 }
 
