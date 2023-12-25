@@ -9,9 +9,9 @@ namespace Accessibility_app.Models
 		public int Id { get; set; }
 		public string Email { get; set; }
 		public string Wachtwoord { get; set; }
-		public string? Rol { get; set; }
+		public string Rol { get; set; } = "Admin";
 		public DateTime LaatstIngelogd { get; set; } = DateTime.Now;
-		public bool Geverifieerd { get; set; }
+		public bool Geverifieerd { get; set; } = false;
 		public List<Bericht>? Berichten { get; set; } = new();
 
 		/*		public bool VergelijkWachtwoord(string wachtwoord)

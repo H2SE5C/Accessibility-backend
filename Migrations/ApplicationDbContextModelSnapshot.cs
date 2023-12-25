@@ -219,7 +219,7 @@ namespace Accessibility_backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Gebruiker");
+                    b.ToTable("Gebruiker", (string)null);
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Hulpmiddel", b =>
@@ -484,7 +484,7 @@ namespace Accessibility_backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("Bedrijf");
+                    b.ToTable("Bedrijf", (string)null);
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Ervaringsdeskundige", b =>
@@ -522,7 +522,7 @@ namespace Accessibility_backend.Migrations
 
                     b.HasIndex("VoogdId");
 
-                    b.ToTable("Ervaringsdeskundige");
+                    b.ToTable("Ervaringsdeskundige", (string)null);
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Medewerker", b =>
@@ -533,7 +533,7 @@ namespace Accessibility_backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("Medewerker");
+                    b.ToTable("Medewerker", (string)null);
                 });
 
             modelBuilder.Entity("AandoeningErvaringsdeskundige", b =>

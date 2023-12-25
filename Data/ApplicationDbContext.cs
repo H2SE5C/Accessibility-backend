@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Accessibility_app.Models;
 using System.Reflection.Emit;
+using System.Reflection.Metadata;
 
 namespace Accessibility_app.Data;
 
@@ -31,21 +32,23 @@ public class ApplicationDbContext : DbContext
 	{
 		base.OnModelCreating(builder);
 
-
 		builder.Entity<Gebruiker>()
 	   .HasMany(u => u.Berichten)
 	   .WithOne(b => b.Verzender)
 	   .HasForeignKey(b => b.VerzenderId)
 	   .OnDelete(DeleteBehavior.Restrict);
 
-		// Andere configuraties...
-
-		// Bijvoorbeeld, als je ook een relatie met de ontvanger hebt:
 		builder.Entity<Bericht>()
 			.HasOne(b => b.Ontvanger)
 			.WithMany()
 			.HasForeignKey(b => b.OntvangerId)
 			.OnDelete(DeleteBehavior.Restrict);
+
+		//TPT inheritance?
+		builder.Entity<Medewerker>().ToTable("Medewerker");
+		builder.Entity<Bedrijf>().ToTable("Bedrijf");
+		builder.Entity<Ervaringsdeskundige>().ToTable("Ervaringsdeskundige");
+		builder.Entity<Gebruiker>().ToTable("Gebruiker");
 	}
 }
 
