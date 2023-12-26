@@ -6,11 +6,12 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+ConfigurationManager configuration = builder.Configuration;
 // Add services to the container.
 
 // For Entity Framework
-var ConnectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(ConnectionString));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString")));
+
 
 
 // For Identity

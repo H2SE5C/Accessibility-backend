@@ -35,7 +35,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 		base.OnModelCreating(builder);
 
 
-		/*builder.Entity<Gebruiker>()
+		builder.Entity<Gebruiker>()
 	   .HasMany(u => u.Berichten)
 	   .WithOne(b => b.Verzender)
 	   .HasForeignKey(b => b.VerzenderId)
@@ -48,7 +48,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 			.HasOne(b => b.Ontvanger)
 			.WithMany()
 			.HasForeignKey(b => b.OntvangerId)
-			.OnDelete(DeleteBehavior.Restrict);*/
+			.OnDelete(DeleteBehavior.Restrict);
 	}
 }
 
