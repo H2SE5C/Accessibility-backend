@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Accessibility_app.Controllers;
-[Authorize(Roles = UserRoles.Admin)]
+[Authorize(Roles = UserRoles.User )]
 [ApiController]
 [Route("api/[controller]")]
 public class WeatherForecastController : ControllerBase
@@ -22,6 +22,7 @@ public class WeatherForecastController : ControllerBase
     }
 
     [HttpGet]
+    [Route("GetWeatherForecast")]
     public IEnumerable<WeatherForecast> Get()
     {
         return Enumerable.Range(1, 5).Select(index => new WeatherForecast
