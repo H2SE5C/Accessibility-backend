@@ -11,7 +11,7 @@ namespace Accessibility_app.Data;
 public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 {
 	public DbSet<Aandoening> Aandoeningen { get; set; }
-    public DbSet<Rol> Rol { get; set; }
+    public DbSet<Rol> Rollen { get; set; }
     public DbSet<Antwoord> Antwoorden { get; set; }
 	public DbSet<Bedrijf> Bedrijven { get; set; }
 	public DbSet<Beperking> Beperkingen { get; set; }

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Accessibility_app.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,15 +10,19 @@ namespace Accessibility_app.Controllers
     [ApiController]
     public class BedrijfController : ControllerBase
     {
-        // GET: api/<BedrijfController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
+		private readonly ApplicationDbContext _context;
+		public BedrijfController(ApplicationDbContext context) { 
+            _context = context;
         }
+		// GET: api/<BedrijfController>
+		[HttpGet]
+		public IActionResult GetBedrijven()
+		{
+			return Ok(_context.Bedrijven.ToList());
+		}
 
-        // GET api/<BedrijfController>/5
-        [HttpGet("{id}")]
+		// GET api/<BedrijfController>/5
+		[HttpGet("{id}")]
         public string Get(int id)
         {
             return "value";

@@ -1,6 +1,7 @@
 ﻿using Accessibility_app.Data;
 using Accessibility_app.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -22,11 +23,12 @@ namespace Accessibility_app.Controllers
             return Ok(_context.Gebruikers.ToList());
         }
 
-        // GET api/<GebruikerController>/5
-        [HttpGet("{id}")]
+		// GET api/<GebruikerController>/5
+		// get related data with Include(). _context.Gebruikers.Where(g => g.Id == id).Include(g => g.Rol).ToListAsync()
+		[HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-			var gebruiker = await _context.Gebruikers.FindAsync(id);
+			var gebruiker = _context.Gebruikers.Where(g => g.Id == id).First();
 
 			if (gebruiker != null)
 			{
