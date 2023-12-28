@@ -4,8 +4,7 @@ namespace Accessibility_backend.Modellen.Extra
 {
     public class Rol: IdentityRole<int>
     {
-        public int Id { get; set; }
-        public String Naam { get; set; }
+        public string Naam { get; set; }
 
     }
 }

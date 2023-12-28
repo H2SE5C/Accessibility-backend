@@ -1,4 +1,4 @@
-﻿/*using Accessibility_app.Data;
+﻿using Accessibility_app.Data;
 using Accessibility_app.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,15 +36,15 @@ namespace Accessibility_app.Controllers
 			return NotFound();
 		}
 
-        // POST api/<GebruikerController>
-        //voorbeeld request: 
-    *//*      {
+        /* POST api/<GebruikerController>
+        voorbeeld request: 
+          {
                 "email": "string",
                 "wachtwoord": "string",
                 "rol": "admin",
                 "geverifieerd": true
-            }*//*
-	[HttpPost]
+            }*/
+	/*[HttpPost]
         public async Task<IActionResult> MaakGebruikerAan([FromBody] Gebruiker gebruiker)
         {
             var nieuweGebruiker = new Gebruiker()
@@ -59,10 +59,10 @@ namespace Accessibility_app.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(nieuweGebruiker);
-        }
+        }*/
 
         // PUT api/<GebruikerController>/5
-        [HttpPut("{id}")]
+       /* [HttpPut("{id}")]
         public async Task<IActionResult> VeranderGegevens(int id, [FromBody] Gebruiker upgedateGebruiker)
         {
             var gebruiker = await _context.Gebruikers.FindAsync(id);
@@ -76,7 +76,7 @@ namespace Accessibility_app.Controllers
 
             return NotFound();
         }
-
+*/
         // DELETE api/<GebruikerController>/5
         [HttpDelete("{id}")]
 		public async Task<IActionResult> Delete(int id)
@@ -94,4 +94,3 @@ namespace Accessibility_app.Controllers
 		}
     }
 }
-*/

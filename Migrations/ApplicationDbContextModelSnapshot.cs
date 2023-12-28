@@ -214,9 +214,6 @@ namespace Accessibility_backend.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("Geverifieerd")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime>("LaatstIngelogd")
                         .HasColumnType("datetime2");
 
@@ -485,31 +482,31 @@ namespace Accessibility_backend.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "dcaa5874-23bf-4741-a004-7bc855fbe734",
+                            ConcurrencyStamp = "e81ec6bc-ca35-44a6-8abc-b33e5ff56d31",
                             Naam = "Developer"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "620a720a-616b-4259-826f-95fa50704bcd",
+                            ConcurrencyStamp = "f6d091e6-904d-4697-a0fd-eedfcbfcbb07",
                             Naam = "Beheerder"
                         },
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "0366a35d-4c45-426e-b556-ced05842d72a",
+                            ConcurrencyStamp = "27f58910-8bbe-48ee-87b0-53918bc543ef",
                             Naam = "Medewerker"
                         },
                         new
                         {
                             Id = 4,
-                            ConcurrencyStamp = "ce1c09fa-3e30-4e7b-be4e-44a04202214a",
-                            Naam = "Ervarindeskundigen"
+                            ConcurrencyStamp = "e6c58ae8-7f32-4a24-84cf-4fa5e663d934",
+                            Naam = "Ervaringsdeskundige"
                         },
                         new
                         {
                             Id = 5,
-                            ConcurrencyStamp = "2c2219dc-d7bc-4843-8f27-a6bc83e6cf46",
+                            ConcurrencyStamp = "a5227b60-95c2-4cfc-aaee-92413daf69eb",
                             Naam = "Bedrijf"
                         });
                 });

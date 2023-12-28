@@ -42,10 +42,6 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 	   .HasForeignKey(b => b.VerzenderId)
 	   .OnDelete(DeleteBehavior.Restrict);
 
-		// Andere configuraties...
-
-		// Bijvoorbeeld, als je ook een relatie met de ontvanger hebt:
-
 		builder.Entity<Bericht>()
 			.HasOne(b => b.Ontvanger)
 			.WithMany()
@@ -56,9 +52,8 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 			new Rol { Id = 1, Naam = "Developer" },
             new Rol { Id = 2, Naam = "Beheerder" },
             new Rol { Id = 3, Naam = "Medewerker" },
-            new Rol { Id = 4, Naam = "Ervarindeskundigen" },
+            new Rol { Id = 4, Naam = "Ervaringsdeskundige" },
             new Rol { Id = 5, Naam = "Bedrijf" }
-
 			);
 
 

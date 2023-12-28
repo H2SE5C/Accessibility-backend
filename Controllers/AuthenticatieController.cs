@@ -46,8 +46,8 @@ namespace Accessibility_app.Controllers
 
                 var authClaims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new (ClaimTypes.Email, user.Email),
+                    new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
 
                 foreach (var userRole in userRoles)
@@ -67,20 +67,18 @@ namespace Accessibility_app.Controllers
         }
 
         [HttpPost]
-        [Route("register-ervaringdeskundigen")]
-        public async Task<IActionResult> Register([FromBody] RegisterDeveloper model)
+        [Route("registreer-beheerder")]
+        public async Task<IActionResult> Registreren([FromBody] RegisterDeveloper model)
         {
             var userExists = await _userManager.FindByNameAsync(model.Email);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
-            //developer = 1 id
-            var rol = await _context.Rol.FindAsync(1);
+
             Gebruiker user = new()
             {
                 UserName = model.Email,
                 Email = model.Email,
-                Geverifieerd = true,
-                Rol = rol
+                RolId = 2,
             };
             var result = await _userManager.CreateAsync(user, model.Wachtwoord);
             if (!result.Succeeded)

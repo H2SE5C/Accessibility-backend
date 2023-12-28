@@ -14,8 +14,6 @@ ConfigurationManager configuration = builder.Configuration;
 // For Entity Framework
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString")));
 
-
-
 // For Identity
 builder.Services.AddIdentity<Gebruiker, Rol>(options => { options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+/ "; })
     .AddEntityFrameworkStores<ApplicationDbContext>()
