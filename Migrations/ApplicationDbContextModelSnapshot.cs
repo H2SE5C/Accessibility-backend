@@ -494,31 +494,31 @@ namespace Accessibility_backend.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "fd3d5408-f7aa-4f45-9bf4-f8270812ad77",
+                            ConcurrencyStamp = "c7cac26d-6654-49bf-b63f-bd089a99eaa3",
                             Naam = "Developer"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "4c8cee04-ec7f-43ce-8b9d-75c048816423",
+                            ConcurrencyStamp = "392cc129-5d4f-4421-b8fd-f4340d3b5399",
                             Naam = "Beheerder"
                         },
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "243ae770-9894-4f2f-a6f9-d6b642ff0481",
+                            ConcurrencyStamp = "48778e97-0585-4f2e-b7a4-c820acbd8b3b",
                             Naam = "Medewerker"
                         },
                         new
                         {
                             Id = 4,
-                            ConcurrencyStamp = "4f36a4a1-6177-4952-bf29-cd9cc2366a54",
+                            ConcurrencyStamp = "73fd6f31-9933-4cbb-86d7-a8525c12d2ac",
                             Naam = "Ervarindeskundigen"
                         },
                         new
                         {
                             Id = 5,
-                            ConcurrencyStamp = "7e5e1c13-37c0-4aa2-a357-9474bc222027",
+                            ConcurrencyStamp = "9b66523c-73b7-4b0a-aae3-38e5c7b0c434",
                             Naam = "Bedrijf"
                         });
                 });
