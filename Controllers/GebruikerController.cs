@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
+//controller wordt gebruikt om admins te maken. developer is ook een soort gebruiker maar dat maken we wel direct in DB
 namespace Accessibility_app.Controllers
 {
     [Route("api/[controller]")]
@@ -18,9 +18,10 @@ namespace Accessibility_app.Controllers
         }
         // GET: api/<GebruikerController>
         [HttpGet]
-        public IActionResult GetGebruikers()
+        public async Task<IActionResult> GetGebruikers()
         {
-            return Ok(_context.Gebruikers.ToList());
+            //misschien nog check als gebruikers lijst null is?
+			return Ok(await _context.Gebruikers.ToListAsync());
         }
 
 		// GET api/<GebruikerController>/5
@@ -43,8 +44,7 @@ namespace Accessibility_app.Controllers
           {
                 "email": "string",
                 "wachtwoord": "string",
-                "rol": "admin",
-                "geverifieerd": true
+                "rol": "admin"
             }*/
 	/*[HttpPost]
         public async Task<IActionResult> MaakGebruikerAan([FromBody] Gebruiker gebruiker)
@@ -53,7 +53,6 @@ namespace Accessibility_app.Controllers
             {
                Email = gebruiker.Email,
                Wachtwoord = gebruiker.Wachtwoord,
-               Rol = gebruiker.Rol,
                Geverifieerd = true,
             };
 

@@ -28,6 +28,7 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 	public DbSet<Voogd> Voogden { get; set; }
 	public DbSet<Vraag> Vragen { get; set; }
 	public DbSet<Vragenlijst> Vragenlijsten { get; set; }
+
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }
@@ -55,8 +56,6 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
             new Rol { Id = 4, Naam = "Ervaringsdeskundige" },
             new Rol { Id = 5, Naam = "Bedrijf" }
 			);
-
-
 
 	}
 }
