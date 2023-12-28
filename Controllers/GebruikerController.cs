@@ -1,4 +1,4 @@
-﻿using Accessibility_app.Data;
+﻿/*using Accessibility_app.Data;
 using Accessibility_app.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,12 +38,12 @@ namespace Accessibility_app.Controllers
 
         // POST api/<GebruikerController>
         //voorbeeld request: 
-    /*      {
+    *//*      {
                 "email": "string",
                 "wachtwoord": "string",
                 "rol": "admin",
                 "geverifieerd": true
-            }*/
+            }*//*
 	[HttpPost]
         public async Task<IActionResult> MaakGebruikerAan([FromBody] Gebruiker gebruiker)
         {
@@ -94,3 +94,4 @@ namespace Accessibility_app.Controllers
 		}
     }
 }
+*/

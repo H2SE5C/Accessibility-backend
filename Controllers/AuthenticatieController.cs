@@ -1,4 +1,5 @@
-﻿using Accessibility_app.Models;
+﻿using Accessibility_app.Data;
+using Accessibility_app.Models;
 using Accessibility_backend.Modellen;
 using Accessibility_backend.Modellen.Extra;
 using Azure;
@@ -21,21 +22,24 @@ namespace Accessibility_app.Controllers
         private readonly UserManager<Gebruiker> _userManager;
         private readonly RoleManager<Rol> _roleManager;
         private readonly IConfiguration _configuration;
+		private readonly ApplicationDbContext _context;
 
-        public AuthenticatieController(
+		public AuthenticatieController(
             UserManager<Gebruiker> userManager,
             RoleManager<Rol> roleManager,
-            IConfiguration configuration)
+            IConfiguration configuration, ApplicationDbContext applicationDbContext)
         {
-            _userManager = userManager;
+			_context = applicationDbContext;
+			_userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
         }
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login([FromBody] Gebruiker model)
+        public async Task<IActionResult> Login([FromBody] RegisterDeveloper model)
         {
             var user = await _userManager.FindByNameAsync(model.Email);
+            
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Wachtwoord))
             {
                 var userRoles = await _userManager.GetRolesAsync(user);
@@ -64,21 +68,27 @@ namespace Accessibility_app.Controllers
 
         [HttpPost]
         [Route("register-ervaringdeskundigen")]
-        public async Task<IActionResult> Register([FromBody] registerDeveloper model)
+        public async Task<IActionResult> Register([FromBody] RegisterDeveloper model)
         {
             var userExists = await _userManager.FindByNameAsync(model.Email);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
-
+            //developer = 1 id
+            var rol = await _context.Rol.FindAsync(1);
             Gebruiker user = new()
             {
+                UserName = model.Email,
                 Email = model.Email,
                 Geverifieerd = true,
+                Rol = rol
             };
             var result = await _userManager.CreateAsync(user, model.Wachtwoord);
             if (!result.Succeeded)
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
-
+            {
+                var exceptionText = result.Errors.Aggregate("User Creation Failed - Identity Exception. Errors were: \n\r\n\r", (current, error) => current + (" - " + error + "\n\r"));
+                throw new Exception(exceptionText);
+                /*return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });*/
+            }
             return Ok(new Response { Status = "Success", Message = "User created successfully!" });
         }
 

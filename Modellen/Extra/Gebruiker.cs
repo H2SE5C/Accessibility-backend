@@ -7,13 +7,16 @@ namespace Accessibility_app.Models
 	[Table("Gebruiker")]
 	public class Gebruiker : IdentityUser<int>
     {
-
-		public string Wachtwoord { get; set; }
 		public Rol Rol { get; set; }
 		public DateTime LaatstIngelogd { get; set; } = DateTime.Now;
 		public bool Geverifieerd { get; set; }
 		public List<Bericht>? Berichten { get; set; } = new();
 
+		/*public override string UserName
+		{
+			get => Email;
+			set => Email = value;
+		}*/
 		/*		public bool VergelijkWachtwoord(string wachtwoord)
 				{
 					return false;

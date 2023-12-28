@@ -2,7 +2,7 @@
 
 namespace Accessibility_backend.Modellen
 {
-    public class registerDeveloper
+    public class RegisterDeveloper
     {
 
         [EmailAddress]
