@@ -211,6 +211,7 @@ namespace Accessibility_backend.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Rol")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Wachtwoord")
