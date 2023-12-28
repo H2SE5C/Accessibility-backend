@@ -17,7 +17,7 @@ namespace Accessibility_app.Models
 		public List<Onderzoek> Onderzoeken { get; set; } = new();
         public string VoorkeurBenadering { get; set; } = null!;
         public List<TypeOnderzoek> TypeOnderzoeken { get; set; } = new();
-        public bool Commecerciële { get; set; }
+        public bool Commercerciële { get; set; }
         public List<Beschikbaarheid> Beschikbaarheisdata { get; set; } = new();
         public Voogd? Voogd { get; set; }
 
