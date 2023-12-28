@@ -4,13 +4,15 @@ using Accessibility_app.Models;
 using System.Reflection.Emit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Accessibility_backend.Modellen.Extra;
 
 namespace Accessibility_app.Data;
 
-public class ApplicationDbContext : IdentityDbContext<IdentityUser>
+public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 {
 	public DbSet<Aandoening> Aandoeningen { get; set; }
-	public DbSet<Antwoord> Antwoorden { get; set; }
+    public DbSet<Rol> Rol { get; set; }
+    public DbSet<Antwoord> Antwoorden { get; set; }
 	public DbSet<Bedrijf> Bedrijven { get; set; }
 	public DbSet<Beperking> Beperkingen { get; set; }
 	public DbSet<Bericht> Berichten { get; set; }
@@ -30,10 +32,9 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
     }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+	protected override void OnModelCreating(ModelBuilder builder)
 	{
 		base.OnModelCreating(builder);
-
 
 		builder.Entity<Gebruiker>()
 	   .HasMany(u => u.Berichten)
@@ -44,11 +45,24 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 		// Andere configuraties...
 
 		// Bijvoorbeeld, als je ook een relatie met de ontvanger hebt:
+
 		builder.Entity<Bericht>()
 			.HasOne(b => b.Ontvanger)
 			.WithMany()
 			.HasForeignKey(b => b.OntvangerId)
 			.OnDelete(DeleteBehavior.Restrict);
+
+		builder.Entity<Rol>().HasData(
+			new Rol { Id = 1, Naam = "Developer" },
+            new Rol { Id = 2, Naam = "Beheerder" },
+            new Rol { Id = 3, Naam = "Medewerker" },
+            new Rol { Id = 4, Naam = "Ervarindeskundigen" },
+            new Rol { Id = 5, Naam = "Bedrijf" }
+
+			);
+
+
+
 	}
 }
 

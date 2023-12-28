@@ -6,6 +6,7 @@ namespace Accessibility_app.Models
 	[Table("Ervaringsdeskundige")]
 	public class Ervaringsdeskundige : Gebruiker
     {
+
 		public int Id { get; set; }
 		public string Voornaam { get; set; } = null!;
         public string Achternaam { get; set; } = null!;

@@ -4,6 +4,7 @@ using Accessibility_app.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Accessibility_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231227021601_gebruikerTable")]
+    partial class gebruikerTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,8 +29,8 @@ namespace Accessibility_backend.Migrations
                     b.Property<int>("AandoeningenId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ErvaringsdeskundigenId")
-                        .HasColumnType("int");
+                    b.Property<string>("ErvaringsdeskundigenId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("AandoeningenId", "ErvaringsdeskundigenId");
 
@@ -62,8 +64,9 @@ namespace Accessibility_backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("GebruikerId")
-                        .HasColumnType("int");
+                    b.Property<string>("GebruikerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Uitkomst")
                         .IsRequired()
@@ -117,6 +120,10 @@ namespace Accessibility_backend.Migrations
                     b.Property<int>("OntvangerId")
                         .HasColumnType("int");
 
+                    b.Property<string>("OntvangerId1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Tekst")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -127,13 +134,17 @@ namespace Accessibility_backend.Migrations
                     b.Property<int>("VerzenderId")
                         .HasColumnType("int");
 
+                    b.Property<string>("VerzenderId1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ChatId");
 
-                    b.HasIndex("OntvangerId");
+                    b.HasIndex("OntvangerId1");
 
-                    b.HasIndex("VerzenderId");
+                    b.HasIndex("VerzenderId1");
 
                     b.ToTable("Bericht");
                 });
@@ -156,8 +167,9 @@ namespace Accessibility_backend.Migrations
                     b.Property<DateTime>("Eindtijd")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ErvaringsdeskundigeId")
-                        .HasColumnType("int");
+                    b.Property<string>("ErvaringsdeskundigeId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -177,8 +189,8 @@ namespace Accessibility_backend.Migrations
                     b.Property<DateTime>("Aanmaakdatum")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("MedewerkerId")
-                        .HasColumnType("int");
+                    b.Property<string>("MedewerkerId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("OnderzoekId")
                         .HasColumnType("int");
@@ -194,11 +206,8 @@ namespace Accessibility_backend.Migrations
 
             modelBuilder.Entity("Accessibility_app.Models.Gebruiker", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
@@ -208,6 +217,7 @@ namespace Accessibility_backend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -243,8 +253,8 @@ namespace Accessibility_backend.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("RolId")
-                        .HasColumnType("int");
+                    b.Property<string>("Rol")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -253,6 +263,7 @@ namespace Accessibility_backend.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -270,9 +281,7 @@ namespace Accessibility_backend.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("RolId");
-
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("Gebruiker", (string)null);
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Hulpmiddel", b =>
@@ -328,8 +337,9 @@ namespace Accessibility_backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("BedrijfId")
-                        .HasColumnType("int");
+                    b.Property<string>("BedrijfId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Beloning")
                         .IsRequired()
@@ -338,8 +348,8 @@ namespace Accessibility_backend.Migrations
                     b.Property<DateTime>("Datum")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("MedewerkerId")
-                        .HasColumnType("int");
+                    b.Property<string>("MedewerkerId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Omschrijving")
                         .IsRequired()
@@ -457,20 +467,73 @@ namespace Accessibility_backend.Migrations
                     b.ToTable("Vragenlijst");
                 });
 
-            modelBuilder.Entity("Accessibility_backend.Modellen.Extra.Rol", b =>
+            modelBuilder.Entity("BeperkingErvaringsdeskundige", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("BeperkingenId")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<string>("ErvaringsdeskundigenId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("BeperkingenId", "ErvaringsdeskundigenId");
+
+                    b.HasIndex("ErvaringsdeskundigenId");
+
+                    b.ToTable("BeperkingErvaringsdeskundige");
+                });
+
+            modelBuilder.Entity("ErvaringsdeskundigeHulpmiddel", b =>
+                {
+                    b.Property<string>("ErvaringsdeskundigenId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("HulpmiddelenId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ErvaringsdeskundigenId", "HulpmiddelenId");
+
+                    b.HasIndex("HulpmiddelenId");
+
+                    b.ToTable("ErvaringsdeskundigeHulpmiddel");
+                });
+
+            modelBuilder.Entity("ErvaringsdeskundigeOnderzoek", b =>
+                {
+                    b.Property<string>("ErvaringsdeskundigenId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("OnderzoekenId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ErvaringsdeskundigenId", "OnderzoekenId");
+
+                    b.HasIndex("OnderzoekenId");
+
+                    b.ToTable("ErvaringsdeskundigeOnderzoek");
+                });
+
+            modelBuilder.Entity("ErvaringsdeskundigeTypeOnderzoek", b =>
+                {
+                    b.Property<string>("ErvaringsdeskundigenId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("TypeOnderzoekenId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ErvaringsdeskundigenId", "TypeOnderzoekenId");
+
+                    b.HasIndex("TypeOnderzoekenId");
+
+                    b.ToTable("ErvaringsdeskundigeTypeOnderzoek");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Naam")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -489,101 +552,9 @@ namespace Accessibility_backend.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ConcurrencyStamp = "fd3d5408-f7aa-4f45-9bf4-f8270812ad77",
-                            Naam = "Developer"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ConcurrencyStamp = "4c8cee04-ec7f-43ce-8b9d-75c048816423",
-                            Naam = "Beheerder"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ConcurrencyStamp = "243ae770-9894-4f2f-a6f9-d6b642ff0481",
-                            Naam = "Medewerker"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ConcurrencyStamp = "4f36a4a1-6177-4952-bf29-cd9cc2366a54",
-                            Naam = "Ervarindeskundigen"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            ConcurrencyStamp = "7e5e1c13-37c0-4aa2-a357-9474bc222027",
-                            Naam = "Bedrijf"
-                        });
                 });
 
-            modelBuilder.Entity("BeperkingErvaringsdeskundige", b =>
-                {
-                    b.Property<int>("BeperkingenId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ErvaringsdeskundigenId")
-                        .HasColumnType("int");
-
-                    b.HasKey("BeperkingenId", "ErvaringsdeskundigenId");
-
-                    b.HasIndex("ErvaringsdeskundigenId");
-
-                    b.ToTable("BeperkingErvaringsdeskundige");
-                });
-
-            modelBuilder.Entity("ErvaringsdeskundigeHulpmiddel", b =>
-                {
-                    b.Property<int>("ErvaringsdeskundigenId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("HulpmiddelenId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ErvaringsdeskundigenId", "HulpmiddelenId");
-
-                    b.HasIndex("HulpmiddelenId");
-
-                    b.ToTable("ErvaringsdeskundigeHulpmiddel");
-                });
-
-            modelBuilder.Entity("ErvaringsdeskundigeOnderzoek", b =>
-                {
-                    b.Property<int>("ErvaringsdeskundigenId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OnderzoekenId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ErvaringsdeskundigenId", "OnderzoekenId");
-
-                    b.HasIndex("OnderzoekenId");
-
-                    b.ToTable("ErvaringsdeskundigeOnderzoek");
-                });
-
-            modelBuilder.Entity("ErvaringsdeskundigeTypeOnderzoek", b =>
-                {
-                    b.Property<int>("ErvaringsdeskundigenId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TypeOnderzoekenId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ErvaringsdeskundigenId", "TypeOnderzoekenId");
-
-                    b.HasIndex("TypeOnderzoekenId");
-
-                    b.ToTable("ErvaringsdeskundigeTypeOnderzoek");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -597,8 +568,9 @@ namespace Accessibility_backend.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -607,7 +579,7 @@ namespace Accessibility_backend.Migrations
                     b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -621,8 +593,9 @@ namespace Accessibility_backend.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -631,7 +604,7 @@ namespace Accessibility_backend.Migrations
                     b.ToTable("AspNetUserClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
@@ -642,8 +615,9 @@ namespace Accessibility_backend.Migrations
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -652,13 +626,13 @@ namespace Accessibility_backend.Migrations
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -667,10 +641,10 @@ namespace Accessibility_backend.Migrations
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
@@ -809,14 +783,14 @@ namespace Accessibility_backend.Migrations
 
                     b.HasOne("Accessibility_app.Models.Gebruiker", "Ontvanger")
                         .WithMany()
-                        .HasForeignKey("OntvangerId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasForeignKey("OntvangerId1")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Accessibility_app.Models.Gebruiker", "Verzender")
-                        .WithMany("Berichten")
-                        .HasForeignKey("VerzenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .WithMany()
+                        .HasForeignKey("VerzenderId1")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Chat");
@@ -848,17 +822,6 @@ namespace Accessibility_backend.Migrations
                         .HasForeignKey("OnderzoekId");
 
                     b.Navigation("Onderzoek");
-                });
-
-            modelBuilder.Entity("Accessibility_app.Models.Gebruiker", b =>
-                {
-                    b.HasOne("Accessibility_backend.Modellen.Extra.Rol", "Rol")
-                        .WithMany()
-                        .HasForeignKey("RolId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Rol");
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Onderzoek", b =>
@@ -959,16 +922,16 @@ namespace Accessibility_backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Accessibility_backend.Modellen.Extra.Rol", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
                     b.HasOne("Accessibility_app.Models.Gebruiker", null)
                         .WithMany()
@@ -977,7 +940,7 @@ namespace Accessibility_backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.HasOne("Accessibility_app.Models.Gebruiker", null)
                         .WithMany()
@@ -986,9 +949,9 @@ namespace Accessibility_backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Accessibility_backend.Modellen.Extra.Rol", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1001,7 +964,7 @@ namespace Accessibility_backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.HasOne("Accessibility_app.Models.Gebruiker", null)
                         .WithMany()
@@ -1044,11 +1007,6 @@ namespace Accessibility_backend.Migrations
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Chat", b =>
-                {
-                    b.Navigation("Berichten");
-                });
-
-            modelBuilder.Entity("Accessibility_app.Models.Gebruiker", b =>
                 {
                     b.Navigation("Berichten");
                 });

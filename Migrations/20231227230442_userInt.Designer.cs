@@ -4,6 +4,7 @@ using Accessibility_app.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Accessibility_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231227230442_userInt")]
+    partial class userInt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -208,6 +210,7 @@ namespace Accessibility_backend.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -243,8 +246,8 @@ namespace Accessibility_backend.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("RolId")
-                        .HasColumnType("int");
+                    b.Property<string>("Rol")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -253,6 +256,7 @@ namespace Accessibility_backend.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -269,8 +273,6 @@ namespace Accessibility_backend.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("RolId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -457,72 +459,6 @@ namespace Accessibility_backend.Migrations
                     b.ToTable("Vragenlijst");
                 });
 
-            modelBuilder.Entity("Accessibility_backend.Modellen.Extra.Rol", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Naam")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
-
-                    b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ConcurrencyStamp = "fd3d5408-f7aa-4f45-9bf4-f8270812ad77",
-                            Naam = "Developer"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ConcurrencyStamp = "4c8cee04-ec7f-43ce-8b9d-75c048816423",
-                            Naam = "Beheerder"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ConcurrencyStamp = "243ae770-9894-4f2f-a6f9-d6b642ff0481",
-                            Naam = "Medewerker"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ConcurrencyStamp = "4f36a4a1-6177-4952-bf29-cd9cc2366a54",
-                            Naam = "Ervarindeskundigen"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            ConcurrencyStamp = "7e5e1c13-37c0-4aa2-a357-9474bc222027",
-                            Naam = "Bedrijf"
-                        });
-                });
-
             modelBuilder.Entity("BeperkingErvaringsdeskundige", b =>
                 {
                     b.Property<int>("BeperkingenId")
@@ -581,6 +517,36 @@ namespace Accessibility_backend.Migrations
                     b.HasIndex("TypeOnderzoekenId");
 
                     b.ToTable("ErvaringsdeskundigeTypeOnderzoek");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -850,17 +816,6 @@ namespace Accessibility_backend.Migrations
                     b.Navigation("Onderzoek");
                 });
 
-            modelBuilder.Entity("Accessibility_app.Models.Gebruiker", b =>
-                {
-                    b.HasOne("Accessibility_backend.Modellen.Extra.Rol", "Rol")
-                        .WithMany()
-                        .HasForeignKey("RolId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Rol");
-                });
-
             modelBuilder.Entity("Accessibility_app.Models.Onderzoek", b =>
                 {
                     b.HasOne("Accessibility_app.Models.Bedrijf", "Bedrijf")
@@ -961,7 +916,7 @@ namespace Accessibility_backend.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
-                    b.HasOne("Accessibility_backend.Modellen.Extra.Rol", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -988,7 +943,7 @@ namespace Accessibility_backend.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
-                    b.HasOne("Accessibility_backend.Modellen.Extra.Rol", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
