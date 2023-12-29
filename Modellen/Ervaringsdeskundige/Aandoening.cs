@@ -9,6 +9,8 @@ namespace Accessibility_app.Models
         public int Id { get; set; }
         public string Naam { get; set; }
         public List<Ervaringsdeskundige>? Ervaringsdeskundigen { get; set; } = new();
+        public int BeperkingId { get; set; }
+        public Beperking? Beperking { get; set; }
     }
 }
 

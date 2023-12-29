@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Accessibility_backend.Modellen.Extra;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Accessibility_app.Data;
 
@@ -36,7 +37,7 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 	protected override void OnModelCreating(ModelBuilder builder)
 	{
 		base.OnModelCreating(builder);
-
+		
 		builder.Entity<Gebruiker>()
 	   .HasMany(u => u.Berichten)
 	   .WithOne(b => b.Verzender)
@@ -57,6 +58,30 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
             new Rol { Id = 5, Naam = "Bedrijf" }
 			);
 
+		builder.Entity<Beperking>().HasData(
+			new { Id = 1, Naam = "Visueel" },
+			new { Id = 2, Naam = "Auditief" },
+			new { Id = 3, Naam = "Motorisch" },
+			new { Id = 4, Naam = "Cognitief" }
+			);
+
+		builder.Entity<Aandoening>().HasData(
+			new { Id = 1, Naam = "Blindheid", BeperkingId = 1 },
+			new { Id = 2, Naam = "Slechtziendheid", BeperkingId = 1 },
+			new { Id = 3, Naam = "Kleurenblindheid", BeperkingId = 1 },
+			new { Id = 4, Naam = "Doofheid", BeperkingId = 2 },
+			new { Id = 5, Naam = "Slechthorendheid", BeperkingId = 2 },
+			new { Id = 6, Naam = "Verlamming", BeperkingId = 3 },
+			new { Id = 7, Naam = "Tremoren of beperkte motorische controle", BeperkingId = 3 },
+			new { Id = 8, Naam = "ADHD", BeperkingId = 4 },
+			new { Id = 9, Naam = "Dyslexie", BeperkingId = 4 }
+			);
+
+		builder.Entity<TypeOnderzoek>().HasData(
+			new { Id = 1, Naam = "Vragenlijst" },
+			new { Id = 2, Naam = "Fysiek" },
+			new { Id = 3, Naam = "Website test" }
+			);
 	}
 }
 

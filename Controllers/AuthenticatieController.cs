@@ -70,7 +70,7 @@ namespace Accessibility_app.Controllers
         //registratie vereist een goede wachtwoord: 1 hoofdletter, cijfer en rare teken
         [HttpPost]
         [Route("registreer-beheerder")]
-        public async Task<IActionResult> Registreren([FromBody] RegisterDeveloper model)
+        public async Task<IActionResult> RegistreerBeheerder([FromBody] RegisterDeveloper model)
         {
 
             var userExists = await _userManager.FindByNameAsync(model.Email);
