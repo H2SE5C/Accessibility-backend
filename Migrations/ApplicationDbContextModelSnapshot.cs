@@ -361,6 +361,28 @@ namespace Accessibility_backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Hulpmiddel");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Naam = "Schermlezers"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Naam = "Brailleleesregels"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Naam = "Contrast- en kleurinstellingen"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Naam = "Aangepaste toetsenborden"
+                        });
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Log", b =>
@@ -577,31 +599,31 @@ namespace Accessibility_backend.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "5b56cd91-e140-4b2d-817b-afb14e055489",
+                            ConcurrencyStamp = "696a7efc-9159-45af-961a-57156f0e1445",
                             Naam = "Developer"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "a5164e45-6337-47e6-a9cc-93f7f74638c0",
+                            ConcurrencyStamp = "87fb5414-15f8-4612-ba22-a1f503079333",
                             Naam = "Beheerder"
                         },
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "3493abd4-bdd8-4ec0-8275-cf68142fd88d",
+                            ConcurrencyStamp = "d1614504-7531-4ca9-8adc-058a6fd92e1e",
                             Naam = "Medewerker"
                         },
                         new
                         {
                             Id = 4,
-                            ConcurrencyStamp = "82a93275-d259-46ae-b207-c55163ab6a90",
+                            ConcurrencyStamp = "33470cd3-3626-4cc8-b256-8d4720e19ae3",
                             Naam = "Ervaringsdeskundige"
                         },
                         new
                         {
                             Id = 5,
-                            ConcurrencyStamp = "e13b6d17-35db-4334-8b6b-d6b31b89da98",
+                            ConcurrencyStamp = "04ec87b6-e8dc-4c06-bec4-e7b07f63b253",
                             Naam = "Bedrijf"
                         });
                 });

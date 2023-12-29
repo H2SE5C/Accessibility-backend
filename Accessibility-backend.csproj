@@ -9,13 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Modellen\NewFolder\**" />
-    <Content Remove="Modellen\NewFolder\**" />
-    <EmbeddedResource Remove="Modellen\NewFolder\**" />
-    <None Remove="Modellen\NewFolder\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Azure.Core" Version="1.36.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.23" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.23" />

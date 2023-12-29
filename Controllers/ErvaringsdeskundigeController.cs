@@ -1,6 +1,7 @@
 ﻿using Accessibility_app.Data;
 using Accessibility_app.Models;
 using Accessibility_backend.Modellen;
+using Accessibility_backend.Modellen.Registreermodellen;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -79,20 +80,37 @@ namespace Accessibility_app.Controllers
 		[HttpPost]
         public async Task<IActionResult> RegistreerErvaringsdeskundige([FromBody] RegisterModel model)
         {
+			var userExists = await _userManager.FindByEmailAsync(model.Email);
+			var rol = await _context.Rollen.Where(r => r.Naam == "Ervaringsdeskundige").FirstAsync();
+			var Hulpmiddelen = _context.Hulpmiddelen.Where(a => model.Hulpmiddelen.Select(aa => aa.Id).Contains(a.Id)).ToList();
+			var Aandoeningen = _context.Aandoeningen.Where(a => model.Aandoeningen.Select(aa => aa.Id).Contains(a.Id)).ToList();
+			var TypeOnderzoeken = _context.TypeOnderzoeken.Where(t => model.TypeOnderzoeken.Select(to => to.Id).Contains(t.Id)).ToList();
+
+			Voogd Voogd = null;
+
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(ModelState);
 			}
-
-			var userExists = await _userManager.FindByNameAsync(model.Email);
-			var rol = await _context.Rollen.Where(r => r.Naam == "Ervaringsdeskundige").FirstAsync();
-
+			
 			if (userExists != null)
 				return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
+			
+			if (model.Minderjarig) {
+				Voogd = await _context.Voogden.Where(v => v.Email == model.VoogdEmail).FirstOrDefaultAsync();
+				if (Voogd == null) {
+					Voogd = new ()
+					{
+						Voornaam = model.VoogdVoornaam,
+						Achternaam = model.VoogdAchternaam,
+						Email = model.VoogdEmail,
+						Telefoonnummer = model.VoogdTelefoonnummer
+					};
 
-			var Aandoeningen = _context.Aandoeningen.Where(a => model.Aandoeningen.Select(aa => aa.Id).Contains(a.Id)).ToList();
-			var TypeOnderzoeken = _context.TypeOnderzoeken.Where(t => model.TypeOnderzoeken.Select(to => to.Id).Contains(t.Id)).ToList();
-
+					await _context.Voogden.AddAsync(Voogd);
+					await _context.SaveChangesAsync();
+				}
+			}
 			Ervaringsdeskundige ervaringsdeskundige = new()
 			{
 				Voornaam = model.Voornaam,
@@ -100,7 +118,7 @@ namespace Accessibility_app.Controllers
 				Postcode = model.Postcode,
 				Minderjarig = model.Minderjarig,
 				PhoneNumber = model.Telefoonnummer,
-				Hulpmiddelen = model.Hulpmiddelen,
+				Hulpmiddelen = Hulpmiddelen,
 				Aandoeningen = Aandoeningen,
 				VoorkeurBenadering = model.VoorkeurBenadering,
 				TypeOnderzoeken = TypeOnderzoeken,
@@ -108,14 +126,7 @@ namespace Accessibility_app.Controllers
 				Commercerciële = model.Commercerciële,
 				Email = model.Email,
 				Rol = rol,
-				Voogd = model.Minderjarig ? 
-				new Voogd()
-				{
-					Voornaam = model.VoogdVoornaam,
-					Achternaam = model.VoogdAchternaam,
-					Email = model.VoogdEmail,
-					Telefoonnummer = model.VoogdTelefoonnummer
-				} : null
+				Voogd = Voogd
 		    };
 			var result = await _userManager.CreateAsync(ervaringsdeskundige, model.Wachtwoord);
 			if (!result.Succeeded)

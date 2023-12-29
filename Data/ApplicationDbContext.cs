@@ -82,6 +82,13 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 			new { Id = 2, Naam = "Fysiek" },
 			new { Id = 3, Naam = "Website test" }
 			);
+
+		builder.Entity<Hulpmiddel>().HasData(
+			new { Id = 1, Naam = "Schermlezers" },
+			new { Id = 2, Naam = "Brailleleesregels" },
+			new { Id = 3, Naam = "Contrast- en kleurinstellingen" },
+			new { Id = 4, Naam = "Aangepaste toetsenborden" }
+			);
 	}
 }
 
