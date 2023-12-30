@@ -26,22 +26,57 @@ namespace Accessibility_app.Controllers
 		[HttpGet]
 		public IActionResult GetErvaringsdeskundigen()
 		{
-			return Ok(_context.Ervaringsdeskundigen.ToList());
+			var ervaringsdeskundigen = _context.Ervaringsdeskundigen
+			  .Include(e => e.Aandoeningen)
+			  .ToList();
+
+			var ervaringsdeskundigenDto = ervaringsdeskundigen
+				.Select(e => new ErvaringsdeskundigeDto
+				{
+					Id = e.Id,
+					Aandoeningen = e.Aandoeningen.Select(a => new AandoeningDto
+					{
+						Id = a.Id,
+						Naam = a.Naam
+					}).ToList()
+				})
+				.ToList();
+			return Ok(ervaringsdeskundigenDto);
 		}
 
 		// GET api/<ErvaringsdeskundigeController>/5
-		//het pakken van relationeel data zoals aandoeningen kan nog niet... misschien moet ik tussentabel maken om het werkend te maken?
-		//de many to many tabel is wel gevuld in de database, ik kan het gewoon niet ophalen door de structuur van de modellen
+		//dit is uhhh de oplossing voor de many to many??
 		[HttpGet("{id}")]
 		public async Task<IActionResult> Get(int id)
 		{
-			var gebruiker = _context.Ervaringsdeskundigen
-		.Include(e => e.Aandoeningen) 
-		.FirstOrDefault(e => e.Id == id);
+			var ervaringsdeskundige = await _context.Ervaringsdeskundigen
+		.Where(e => e.Id == id)
+		.Include(e => e.Aandoeningen)
+		.Include(e => e.Hulpmiddelen)
+		.Select(e => new ErvaringsdeskundigeDto { 
+		Id = e.Id,
+		Voornaam = e.Voornaam,
+		Achternaam = e.Achternaam,
+		Postcode = e.Postcode,
+		Minderjarig = e.Minderjarig,
+		Hulpmiddelen = e.Hulpmiddelen.Select(a => new HulpmiddelDto
+		{
+			Id = a.Id,
+			Naam = a.Naam
+		}).ToList(),
+		Aandoeningen = e.Aandoeningen.Select(a => new AandoeningDto
+		{
+			Id = a.Id,
+			Naam = a.Naam
+		}).ToList(),
+		Commercerciële = e.Commercerciële,
+		Voogd = e.Voogd
+		})
+		.FirstAsync();
 
-			if (gebruiker != null)
+			if (ervaringsdeskundige != null)
 			{
-				return Ok(gebruiker);
+				return Ok(ervaringsdeskundige);
 			}
 
 			return NotFound();
