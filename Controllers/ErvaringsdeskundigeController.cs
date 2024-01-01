@@ -31,7 +31,7 @@ namespace Accessibility_app.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetErvaringsdeskundigen()
 		{
-			/*var ervaringsdeskundigen = _context.Ervaringsdeskundigen
+			var ervaringsdeskundigen = _context.Ervaringsdeskundigen
 			  .Include(e => e.Aandoeningen)
 			  .ToList();
 
@@ -45,14 +45,9 @@ namespace Accessibility_app.Controllers
 						Naam = a.Naam
 					}).ToList()
 				})
-				.ToList();*/
+				.ToList();
 
-			var ervaringsdeskundige = await _context.Ervaringsdeskundigen.FindAsync(8);
-			var token = await _userManager.GenerateEmailConfirmationTokenAsync(ervaringsdeskundige);
-			var link = Url.Action(nameof(VerifieerEmail), "Ervaringsdeskundige", new { token, email = ervaringsdeskundige.Email }, Request.Scheme);
-			await _emailSender.SendEmailAsync(ervaringsdeskundige.Email, "verifieer email accessibility", link);
-			return Ok("verstuurd?");
-			/*return Ok(ervaringsdeskundigenDto);*/
+			return Ok(ervaringsdeskundigenDto);
 		}
 		//dit kan ergens anders zodat bedrijf het ook kan gebruiken misschien? idk
 		[HttpGet("/verifieer")]
@@ -63,7 +58,7 @@ namespace Accessibility_app.Controllers
 				return BadRequest();
 
 			await _userManager.ConfirmEmailAsync(gebruiker, token);
-			return Ok("<h1>Geverifieerd! U kan dit venster sluiten.<h1>");
+			return Ok("Geverifieerd! U kan dit venster sluiten.");
 		}
 
 		// GET api/<ErvaringsdeskundigeController>/5
