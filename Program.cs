@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Accessibility_app.Models;
 using Accessibility_backend.Modellen.Extra;
+using Accessibility_backend;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
@@ -49,6 +50,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 var app = builder.Build();
 

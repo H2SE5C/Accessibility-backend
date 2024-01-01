@@ -1,10 +1,13 @@
 ﻿using Accessibility_app.Data;
 using Accessibility_app.Models;
+using Accessibility_backend;
 using Accessibility_backend.Modellen;
 using Accessibility_backend.Modellen.Registreermodellen;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,17 +19,19 @@ namespace Accessibility_app.Controllers
     {
 		private readonly ApplicationDbContext _context;
 		private readonly UserManager<Gebruiker> _userManager;
-		public ErvaringsdeskundigeController(UserManager<Gebruiker> userManager, ApplicationDbContext context)
+		private readonly IEmailSender _emailSender;
+		public ErvaringsdeskundigeController(UserManager<Gebruiker> userManager, ApplicationDbContext context, IEmailSender emailSender)
 		{
 			_userManager = userManager;
 			_context = context;
+			_emailSender = emailSender;
 		}
 
 		// GET: api/<ErvaringsdeskundigeController>
 		[HttpGet]
-		public IActionResult GetErvaringsdeskundigen()
+		public async Task<IActionResult> GetErvaringsdeskundigen()
 		{
-			var ervaringsdeskundigen = _context.Ervaringsdeskundigen
+			/*var ervaringsdeskundigen = _context.Ervaringsdeskundigen
 			  .Include(e => e.Aandoeningen)
 			  .ToList();
 
@@ -40,8 +45,25 @@ namespace Accessibility_app.Controllers
 						Naam = a.Naam
 					}).ToList()
 				})
-				.ToList();
-			return Ok(ervaringsdeskundigenDto);
+				.ToList();*/
+
+			var ervaringsdeskundige = await _context.Ervaringsdeskundigen.FindAsync(8);
+			var token = await _userManager.GenerateEmailConfirmationTokenAsync(ervaringsdeskundige);
+			var link = Url.Action(nameof(VerifieerEmail), "Ervaringsdeskundige", new { token, email = ervaringsdeskundige.Email }, Request.Scheme);
+			await _emailSender.SendEmailAsync(ervaringsdeskundige.Email, "verifieer email accessibility", link);
+			return Ok("verstuurd?");
+			/*return Ok(ervaringsdeskundigenDto);*/
+		}
+		//dit kan ergens anders zodat bedrijf het ook kan gebruiken misschien? idk
+		[HttpGet("/verifieer")]
+		public async Task<IActionResult> VerifieerEmail(string token, string email)
+		{
+			var gebruiker = await _userManager.FindByEmailAsync(email);
+			if (gebruiker == null)
+				return BadRequest();
+
+			await _userManager.ConfirmEmailAsync(gebruiker, token);
+			return Ok("<h1>Geverifieerd! U kan dit venster sluiten.<h1>");
 		}
 
 		// GET api/<ErvaringsdeskundigeController>/5
@@ -53,24 +75,25 @@ namespace Accessibility_app.Controllers
 		.Where(e => e.Id == id)
 		.Include(e => e.Aandoeningen)
 		.Include(e => e.Hulpmiddelen)
-		.Select(e => new ErvaringsdeskundigeDto { 
-		Id = e.Id,
-		Voornaam = e.Voornaam,
-		Achternaam = e.Achternaam,
-		Postcode = e.Postcode,
-		Minderjarig = e.Minderjarig,
-		Hulpmiddelen = e.Hulpmiddelen.Select(a => new HulpmiddelDto
+		.Select(e => new ErvaringsdeskundigeDto
 		{
-			Id = a.Id,
-			Naam = a.Naam
-		}).ToList(),
-		Aandoeningen = e.Aandoeningen.Select(a => new AandoeningDto
-		{
-			Id = a.Id,
-			Naam = a.Naam
-		}).ToList(),
-		Commercerciële = e.Commercerciële,
-		Voogd = e.Voogd
+			Id = e.Id,
+			Voornaam = e.Voornaam,
+			Achternaam = e.Achternaam,
+			Postcode = e.Postcode,
+			Minderjarig = e.Minderjarig,
+			Hulpmiddelen = e.Hulpmiddelen.Select(a => new HulpmiddelDto
+			{
+				Id = a.Id,
+				Naam = a.Naam
+			}).ToList(),
+			Aandoeningen = e.Aandoeningen.Select(a => new AandoeningDto
+			{
+				Id = a.Id,
+				Naam = a.Naam
+			}).ToList(),
+			Commercerciële = e.Commercerciële,
+			Voogd = e.Voogd
 		})
 		.FirstAsync();
 
@@ -163,6 +186,7 @@ namespace Accessibility_app.Controllers
 				Rol = rol,
 				Voogd = Voogd
 		    };
+			
 			var result = await _userManager.CreateAsync(ervaringsdeskundige, model.Wachtwoord);
 			if (!result.Succeeded)
 			{
@@ -170,7 +194,14 @@ namespace Accessibility_app.Controllers
 				throw new Exception(exceptionText);
 				/*return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });*/
 			}
-			return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+
+			//email verzend stuk kan ook misschien een methode worden?
+			var token = await _userManager.GenerateEmailConfirmationTokenAsync(ervaringsdeskundige);
+			var link = Url.Action(nameof(VerifieerEmail), "Ervaringsdeskundige", new { token, email = ervaringsdeskundige.Email }, Request.Scheme);
+			await _emailSender.SendEmailAsync(ervaringsdeskundige.Email, "verifieer email accessibility", link);
+
+			/*	await _userManager.AddToRoleAsync(ervaringsdeskundige, "Ervaringsdeskundige");*/
+			return Ok(new Response { Status = "Success", Message = "Er is een verificatie email verstuurd naar: "+ervaringsdeskundige.Email+"!" });
 		}
 
         // PUT api/<ErvaringsdeskundigeController>/5
