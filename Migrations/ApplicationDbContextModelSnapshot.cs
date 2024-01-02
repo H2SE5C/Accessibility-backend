@@ -599,31 +599,31 @@ namespace Accessibility_backend.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "696a7efc-9159-45af-961a-57156f0e1445",
+                            ConcurrencyStamp = "f84ec442-8c52-4acf-b9f3-f9490981052a",
                             Naam = "Developer"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "87fb5414-15f8-4612-ba22-a1f503079333",
+                            ConcurrencyStamp = "196eb593-64c8-4e42-b65d-10cda3060053",
                             Naam = "Beheerder"
                         },
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "d1614504-7531-4ca9-8adc-058a6fd92e1e",
+                            ConcurrencyStamp = "1bd01c14-4a5e-41eb-b361-a6fd95bcc43c",
                             Naam = "Medewerker"
                         },
                         new
                         {
                             Id = 4,
-                            ConcurrencyStamp = "33470cd3-3626-4cc8-b256-8d4720e19ae3",
+                            ConcurrencyStamp = "fbd81272-d7cb-4bd0-a759-1342a6535ac8",
                             Naam = "Ervaringsdeskundige"
                         },
                         new
                         {
                             Id = 5,
-                            ConcurrencyStamp = "04ec87b6-e8dc-4c06-bec4-e7b07f63b253",
+                            ConcurrencyStamp = "098d8f05-bf20-45fb-8ead-b813c402eab5",
                             Naam = "Bedrijf"
                         });
                 });
@@ -822,9 +822,6 @@ namespace Accessibility_backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("BeperkingId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("Commercerciële")
                         .HasColumnType("bit");
 
@@ -845,8 +842,6 @@ namespace Accessibility_backend.Migrations
                     b.Property<string>("Voornaam")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.HasIndex("BeperkingId");
 
                     b.HasIndex("VoogdId");
 
@@ -1127,10 +1122,6 @@ namespace Accessibility_backend.Migrations
 
             modelBuilder.Entity("Accessibility_app.Models.Ervaringsdeskundige", b =>
                 {
-                    b.HasOne("Accessibility_app.Models.Beperking", null)
-                        .WithMany("Ervaringsdeskundigen")
-                        .HasForeignKey("BeperkingId");
-
                     b.HasOne("Accessibility_app.Models.Gebruiker", null)
                         .WithOne()
                         .HasForeignKey("Accessibility_app.Models.Ervaringsdeskundige", "Id")
@@ -1156,8 +1147,6 @@ namespace Accessibility_backend.Migrations
             modelBuilder.Entity("Accessibility_app.Models.Beperking", b =>
                 {
                     b.Navigation("Aandoeningen");
-
-                    b.Navigation("Ervaringsdeskundigen");
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Chat", b =>

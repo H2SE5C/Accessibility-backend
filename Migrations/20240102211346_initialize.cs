@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Accessibility_backend.Migrations
 {
-    public partial class test : Migration
+    public partial class initialize : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -319,8 +319,7 @@ namespace Accessibility_backend.Migrations
                     Minderjarig = table.Column<bool>(type: "bit", nullable: false),
                     VoorkeurBenadering = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Commercerciële = table.Column<bool>(type: "bit", nullable: false),
-                    VoogdId = table.Column<int>(type: "int", nullable: true),
-                    BeperkingId = table.Column<int>(type: "int", nullable: true)
+                    VoogdId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -329,11 +328,6 @@ namespace Accessibility_backend.Migrations
                         name: "FK_Ervaringsdeskundige_AspNetUsers_Id",
                         column: x => x.Id,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Ervaringsdeskundige_Beperking_BeperkingId",
-                        column: x => x.BeperkingId,
-                        principalTable: "Beperking",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Ervaringsdeskundige_Voogd_VoogdId",
@@ -631,11 +625,11 @@ namespace Accessibility_backend.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Naam", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { 1, "b1c0cd8b-9224-4827-a720-694445e50ee9", "Developer", null, null },
-                    { 2, "23ece0d0-f7d5-4efd-9e2e-d850077cb217", "Beheerder", null, null },
-                    { 3, "de0e45eb-bd59-4033-a1fc-fbed22604b57", "Medewerker", null, null },
-                    { 4, "53a1c590-16b2-45b6-8ba9-6b45ed8d473f", "Ervaringsdeskundige", null, null },
-                    { 5, "73913507-721e-4dfd-8bb4-ea825e5846ef", "Bedrijf", null, null }
+                    { 1, "f84ec442-8c52-4acf-b9f3-f9490981052a", "Developer", null, null },
+                    { 2, "196eb593-64c8-4e42-b65d-10cda3060053", "Beheerder", null, null },
+                    { 3, "1bd01c14-4a5e-41eb-b361-a6fd95bcc43c", "Medewerker", null, null },
+                    { 4, "fbd81272-d7cb-4bd0-a759-1342a6535ac8", "Ervaringsdeskundige", null, null },
+                    { 5, "098d8f05-bf20-45fb-8ead-b813c402eab5", "Bedrijf", null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -647,6 +641,27 @@ namespace Accessibility_backend.Migrations
                     { 2, "Auditief" },
                     { 3, "Motorisch" },
                     { 4, "Cognitief" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Hulpmiddel",
+                columns: new[] { "Id", "Naam" },
+                values: new object[,]
+                {
+                    { 1, "Schermlezers" },
+                    { 2, "Brailleleesregels" },
+                    { 3, "Contrast- en kleurinstellingen" },
+                    { 4, "Aangepaste toetsenborden" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "TypeOnderzoek",
+                columns: new[] { "Id", "Naam" },
+                values: new object[,]
+                {
+                    { 1, "Vragenlijst" },
+                    { 2, "Fysiek" },
+                    { 3, "Website test" }
                 });
 
             migrationBuilder.InsertData(
@@ -765,11 +780,6 @@ namespace Accessibility_backend.Migrations
                 column: "OnderzoekId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Ervaringsdeskundige_BeperkingId",
-                table: "Ervaringsdeskundige",
-                column: "BeperkingId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Ervaringsdeskundige_VoogdId",
                 table: "Ervaringsdeskundige",
                 column: "VoogdId");
@@ -870,13 +880,13 @@ namespace Accessibility_backend.Migrations
                 name: "Ervaringsdeskundige");
 
             migrationBuilder.DropTable(
+                name: "Beperking");
+
+            migrationBuilder.DropTable(
                 name: "Medewerker");
 
             migrationBuilder.DropTable(
                 name: "Onderzoek");
-
-            migrationBuilder.DropTable(
-                name: "Beperking");
 
             migrationBuilder.DropTable(
                 name: "Voogd");
