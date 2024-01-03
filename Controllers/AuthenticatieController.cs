@@ -33,9 +33,9 @@ namespace Accessibility_app.Controllers
         }
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login([FromBody] Gebruiker model)
+        public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            var user = await _userManager.FindByNameAsync(model.Email);
+            var user = await _userManager.FindByEmailAsync(model.Email);
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Wachtwoord))
             {
                 var userRoles = await _userManager.GetRolesAsync(user);
@@ -63,7 +63,7 @@ namespace Accessibility_app.Controllers
         }
 
         [HttpPost]
-        [Route("register-ervaringdeskundigen")]
+        [Route("register-developer")]
         public async Task<IActionResult> Register([FromBody] registerDeveloper model)
         {
             var userExists = await _userManager.FindByNameAsync(model.Email);
@@ -74,6 +74,7 @@ namespace Accessibility_app.Controllers
             {
                 Email = model.Email,
                 Geverifieerd = true,
+                Wachtwoord = model.Wachtwoord,
             };
             var result = await _userManager.CreateAsync(user, model.Wachtwoord);
             if (!result.Succeeded)

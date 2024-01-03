@@ -500,25 +500,25 @@ namespace Accessibility_backend.Migrations
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "392cc129-5d4f-4421-b8fd-f4340d3b5399",
+                            ConcurrencyStamp = "28066946-a9b4-4d79-b605-195be9f0e78e",
                             Naam = "Beheerder"
                         },
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "48778e97-0585-4f2e-b7a4-c820acbd8b3b",
+                            ConcurrencyStamp = "695acc3c-317b-44c5-a7ef-76d04626329c",
                             Naam = "Medewerker"
                         },
                         new
                         {
                             Id = 4,
-                            ConcurrencyStamp = "73fd6f31-9933-4cbb-86d7-a8525c12d2ac",
+                            ConcurrencyStamp = "75350f49-d6b4-4d0d-8cd6-a7bbc699231e",
                             Naam = "Ervarindeskundigen"
                         },
                         new
                         {
                             Id = 5,
-                            ConcurrencyStamp = "9b66523c-73b7-4b0a-aae3-38e5c7b0c434",
+                            ConcurrencyStamp = "919e6954-d89a-40e6-be16-4caa64a47c15",
                             Naam = "Bedrijf"
                         });
                 });
@@ -848,17 +848,6 @@ namespace Accessibility_backend.Migrations
                         .HasForeignKey("OnderzoekId");
 
                     b.Navigation("Onderzoek");
-                });
-
-            modelBuilder.Entity("Accessibility_app.Models.Gebruiker", b =>
-                {
-                    b.HasOne("Accessibility_backend.Modellen.Extra.Rol", "Rol")
-                        .WithMany()
-                        .HasForeignKey("RolId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Rol");
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Onderzoek", b =>

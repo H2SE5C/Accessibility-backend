@@ -6,10 +6,10 @@ namespace Accessibility_backend.Modellen
     {
 
         [EmailAddress]
-        [Required(ErrorMessage = "Email is required")]
+        [Required(ErrorMessage = "Email is vereist")]
         public string? Email { get; set; }
 
-        [Required(ErrorMessage = "Password is required")]
+        [Required(ErrorMessage = "Password is vereist")]
         public string? Wachtwoord{ get; set; }
     }
 }
