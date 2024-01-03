@@ -5,13 +5,14 @@ using System.Reflection.Emit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Accessibility_backend.Modellen.Extra;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Accessibility_app.Data;
 
 public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 {
 	public DbSet<Aandoening> Aandoeningen { get; set; }
-    public DbSet<Rol> Rol { get; set; }
+    public DbSet<Rol> Rollen { get; set; }
     public DbSet<Antwoord> Antwoorden { get; set; }
 	public DbSet<Bedrijf> Bedrijven { get; set; }
 	public DbSet<Beperking> Beperkingen { get; set; }
@@ -28,6 +29,7 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 	public DbSet<Voogd> Voogden { get; set; }
 	public DbSet<Vraag> Vragen { get; set; }
 	public DbSet<Vragenlijst> Vragenlijsten { get; set; }
+
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }
@@ -35,16 +37,12 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 	protected override void OnModelCreating(ModelBuilder builder)
 	{
 		base.OnModelCreating(builder);
-
+		
 		builder.Entity<Gebruiker>()
 	   .HasMany(u => u.Berichten)
 	   .WithOne(b => b.Verzender)
 	   .HasForeignKey(b => b.VerzenderId)
 	   .OnDelete(DeleteBehavior.Restrict);
-
-		// Andere configuraties...
-
-		// Bijvoorbeeld, als je ook een relatie met de ontvanger hebt:
 
 		builder.Entity<Bericht>()
 			.HasOne(b => b.Ontvanger)
@@ -56,13 +54,41 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 			new Rol { Id = 1, Naam = "Developer" },
             new Rol { Id = 2, Naam = "Beheerder" },
             new Rol { Id = 3, Naam = "Medewerker" },
-            new Rol { Id = 4, Naam = "Ervarindeskundigen" },
+            new Rol { Id = 4, Naam = "Ervaringsdeskundige" },
             new Rol { Id = 5, Naam = "Bedrijf" }
-
 			);
 
+		builder.Entity<Beperking>().HasData(
+			new { Id = 1, Naam = "Visueel" },
+			new { Id = 2, Naam = "Auditief" },
+			new { Id = 3, Naam = "Motorisch" },
+			new { Id = 4, Naam = "Cognitief" }
+			);
 
+		builder.Entity<Aandoening>().HasData(
+			new { Id = 1, Naam = "Blindheid", BeperkingId = 1 },
+			new { Id = 2, Naam = "Slechtziendheid", BeperkingId = 1 },
+			new { Id = 3, Naam = "Kleurenblindheid", BeperkingId = 1 },
+			new { Id = 4, Naam = "Doofheid", BeperkingId = 2 },
+			new { Id = 5, Naam = "Slechthorendheid", BeperkingId = 2 },
+			new { Id = 6, Naam = "Verlamming", BeperkingId = 3 },
+			new { Id = 7, Naam = "Tremoren of beperkte motorische controle", BeperkingId = 3 },
+			new { Id = 8, Naam = "ADHD", BeperkingId = 4 },
+			new { Id = 9, Naam = "Dyslexie", BeperkingId = 4 }
+			);
 
+		builder.Entity<TypeOnderzoek>().HasData(
+			new { Id = 1, Naam = "Vragenlijst" },
+			new { Id = 2, Naam = "Fysiek" },
+			new { Id = 3, Naam = "Website test" }
+			);
+
+		builder.Entity<Hulpmiddel>().HasData(
+			new { Id = 1, Naam = "Schermlezers" },
+			new { Id = 2, Naam = "Brailleleesregels" },
+			new { Id = 3, Naam = "Contrast- en kleurinstellingen" },
+			new { Id = 4, Naam = "Aangepaste toetsenborden" }
+			);
 	}
 }
 

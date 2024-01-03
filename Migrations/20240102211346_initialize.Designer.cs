@@ -4,6 +4,7 @@ using Accessibility_app.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Accessibility_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240102211346_initialize")]
+    partial class initialize
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -605,42 +607,25 @@ namespace Accessibility_backend.Migrations
                         new
                         {
                             Id = 2,
-<<<<<<< HEAD
-                            ConcurrencyStamp = "28066946-a9b4-4d79-b605-195be9f0e78e",
-=======
                             ConcurrencyStamp = "196eb593-64c8-4e42-b65d-10cda3060053",
->>>>>>> main
                             Naam = "Beheerder"
                         },
                         new
                         {
                             Id = 3,
-<<<<<<< HEAD
-                            ConcurrencyStamp = "695acc3c-317b-44c5-a7ef-76d04626329c",
-=======
                             ConcurrencyStamp = "1bd01c14-4a5e-41eb-b361-a6fd95bcc43c",
->>>>>>> main
                             Naam = "Medewerker"
                         },
                         new
                         {
                             Id = 4,
-<<<<<<< HEAD
-                            ConcurrencyStamp = "75350f49-d6b4-4d0d-8cd6-a7bbc699231e",
-                            Naam = "Ervarindeskundigen"
-=======
                             ConcurrencyStamp = "fbd81272-d7cb-4bd0-a759-1342a6535ac8",
                             Naam = "Ervaringsdeskundige"
->>>>>>> main
                         },
                         new
                         {
                             Id = 5,
-<<<<<<< HEAD
-                            ConcurrencyStamp = "919e6954-d89a-40e6-be16-4caa64a47c15",
-=======
                             ConcurrencyStamp = "098d8f05-bf20-45fb-8ead-b813c402eab5",
->>>>>>> main
                             Naam = "Bedrijf"
                         });
                 });
@@ -970,6 +955,17 @@ namespace Accessibility_backend.Migrations
                         .HasForeignKey("OnderzoekId");
 
                     b.Navigation("Onderzoek");
+                });
+
+            modelBuilder.Entity("Accessibility_app.Models.Gebruiker", b =>
+                {
+                    b.HasOne("Accessibility_backend.Modellen.Extra.Rol", "Rol")
+                        .WithMany()
+                        .HasForeignKey("RolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Rol");
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Onderzoek", b =>

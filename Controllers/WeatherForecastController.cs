@@ -1,5 +1,5 @@
 ﻿using Accessibility_backend;
-using Accessibility_backend.Modellen;
+using Accessibility_backend.Modellen.Registreermodellen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
