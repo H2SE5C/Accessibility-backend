@@ -599,48 +599,31 @@ namespace Accessibility_backend.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "f84ec442-8c52-4acf-b9f3-f9490981052a",
+                            ConcurrencyStamp = "f3e3886a-0e05-4a60-b8fa-4bcb217af3de",
                             Naam = "Developer"
                         },
                         new
                         {
                             Id = 2,
-<<<<<<< HEAD
-                            ConcurrencyStamp = "28066946-a9b4-4d79-b605-195be9f0e78e",
-=======
-                            ConcurrencyStamp = "196eb593-64c8-4e42-b65d-10cda3060053",
->>>>>>> main
+                            ConcurrencyStamp = "e9005cde-8195-4a0f-80a1-1daf34a266f8",
                             Naam = "Beheerder"
                         },
                         new
                         {
                             Id = 3,
-<<<<<<< HEAD
-                            ConcurrencyStamp = "695acc3c-317b-44c5-a7ef-76d04626329c",
-=======
-                            ConcurrencyStamp = "1bd01c14-4a5e-41eb-b361-a6fd95bcc43c",
->>>>>>> main
+                            ConcurrencyStamp = "7313075c-0376-44d6-b3b0-589c05194886",
                             Naam = "Medewerker"
                         },
                         new
                         {
                             Id = 4,
-<<<<<<< HEAD
-                            ConcurrencyStamp = "75350f49-d6b4-4d0d-8cd6-a7bbc699231e",
-                            Naam = "Ervarindeskundigen"
-=======
-                            ConcurrencyStamp = "fbd81272-d7cb-4bd0-a759-1342a6535ac8",
+                            ConcurrencyStamp = "7b474d50-6a3a-42e4-a22c-4749b090828d",
                             Naam = "Ervaringsdeskundige"
->>>>>>> main
                         },
                         new
                         {
                             Id = 5,
-<<<<<<< HEAD
-                            ConcurrencyStamp = "919e6954-d89a-40e6-be16-4caa64a47c15",
-=======
-                            ConcurrencyStamp = "098d8f05-bf20-45fb-8ead-b813c402eab5",
->>>>>>> main
+                            ConcurrencyStamp = "adf80090-4a73-4d3a-b12f-90b6f082620d",
                             Naam = "Bedrijf"
                         });
                 });
@@ -970,6 +953,17 @@ namespace Accessibility_backend.Migrations
                         .HasForeignKey("OnderzoekId");
 
                     b.Navigation("Onderzoek");
+                });
+
+            modelBuilder.Entity("Accessibility_app.Models.Gebruiker", b =>
+                {
+                    b.HasOne("Accessibility_backend.Modellen.Extra.Rol", "Rol")
+                        .WithMany()
+                        .HasForeignKey("RolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Rol");
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Onderzoek", b =>

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Accessibility_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240103013143_databaseMake")]
+    [Migration("20240103021221_databaseMake")]
     partial class databaseMake
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,13 +47,74 @@ namespace Accessibility_backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("BeperkingId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Naam")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BeperkingId");
+
                     b.ToTable("Aandoening");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BeperkingId = 1,
+                            Naam = "Blindheid"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            BeperkingId = 1,
+                            Naam = "Slechtziendheid"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            BeperkingId = 1,
+                            Naam = "Kleurenblindheid"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            BeperkingId = 2,
+                            Naam = "Doofheid"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            BeperkingId = 2,
+                            Naam = "Slechthorendheid"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            BeperkingId = 3,
+                            Naam = "Verlamming"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            BeperkingId = 3,
+                            Naam = "Tremoren of beperkte motorische controle"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            BeperkingId = 4,
+                            Naam = "ADHD"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            BeperkingId = 4,
+                            Naam = "Dyslexie"
+                        });
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Antwoord", b =>
@@ -95,14 +156,31 @@ namespace Accessibility_backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("OnderzoekId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("OnderzoekId");
-
                     b.ToTable("Beperking");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Naam = "Visueel"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Naam = "Auditief"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Naam = "Motorisch"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Naam = "Cognitief"
+                        });
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Bericht", b =>
@@ -216,9 +294,6 @@ namespace Accessibility_backend.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("Geverifieerd")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime>("LaatstIngelogd")
                         .HasColumnType("datetime2");
 
@@ -258,10 +333,6 @@ namespace Accessibility_backend.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("Wachtwoord")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -292,6 +363,28 @@ namespace Accessibility_backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Hulpmiddel");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Naam = "Schermlezers"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Naam = "Brailleleesregels"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Naam = "Contrast- en kleurinstellingen"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Naam = "Aangepaste toetsenborden"
+                        });
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Log", b =>
@@ -340,9 +433,6 @@ namespace Accessibility_backend.Migrations
                     b.Property<DateTime>("Datum")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("MedewerkerId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Omschrijving")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -364,8 +454,6 @@ namespace Accessibility_backend.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BedrijfId");
-
-                    b.HasIndex("MedewerkerId");
 
                     b.HasIndex("TypeOnderzoekId");
 
@@ -389,6 +477,23 @@ namespace Accessibility_backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TypeOnderzoek");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Naam = "Vragenlijst"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Naam = "Fysiek"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Naam = "Website test"
+                        });
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Voogd", b =>
@@ -496,48 +601,48 @@ namespace Accessibility_backend.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "2cbffd56-3419-41f9-bb71-48a736245c86",
+                            ConcurrencyStamp = "f3e3886a-0e05-4a60-b8fa-4bcb217af3de",
                             Naam = "Developer"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "c15bbd53-2969-422a-884b-4be14ef40c1c",
+                            ConcurrencyStamp = "e9005cde-8195-4a0f-80a1-1daf34a266f8",
                             Naam = "Beheerder"
                         },
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "2aa19b0e-4588-4f92-91dc-6604415ad461",
+                            ConcurrencyStamp = "7313075c-0376-44d6-b3b0-589c05194886",
                             Naam = "Medewerker"
                         },
                         new
                         {
                             Id = 4,
-                            ConcurrencyStamp = "ffd30102-a6ce-474e-b2ab-5453372069cc",
-                            Naam = "Ervarindeskundigen"
+                            ConcurrencyStamp = "7b474d50-6a3a-42e4-a22c-4749b090828d",
+                            Naam = "Ervaringsdeskundige"
                         },
                         new
                         {
                             Id = 5,
-                            ConcurrencyStamp = "3bc0c626-82e6-4a6f-b5ae-9392d01f8c9f",
+                            ConcurrencyStamp = "adf80090-4a73-4d3a-b12f-90b6f082620d",
                             Naam = "Bedrijf"
                         });
                 });
 
-            modelBuilder.Entity("BeperkingErvaringsdeskundige", b =>
+            modelBuilder.Entity("BeperkingOnderzoek", b =>
                 {
                     b.Property<int>("BeperkingenId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ErvaringsdeskundigenId")
+                    b.Property<int>("OnderzoekenId")
                         .HasColumnType("int");
 
-                    b.HasKey("BeperkingenId", "ErvaringsdeskundigenId");
+                    b.HasKey("BeperkingenId", "OnderzoekenId");
 
-                    b.HasIndex("ErvaringsdeskundigenId");
+                    b.HasIndex("OnderzoekenId");
 
-                    b.ToTable("BeperkingErvaringsdeskundige");
+                    b.ToTable("BeperkingOnderzoek");
                 });
 
             modelBuilder.Entity("ErvaringsdeskundigeHulpmiddel", b =>
@@ -719,17 +824,13 @@ namespace Accessibility_backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Commecerciële")
+                    b.Property<bool>("Commercerciële")
                         .HasColumnType("bit");
 
                     b.Property<bool>("Minderjarig")
                         .HasColumnType("bit");
 
                     b.Property<string>("Postcode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telefoonnummer")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -775,6 +876,17 @@ namespace Accessibility_backend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Accessibility_app.Models.Aandoening", b =>
+                {
+                    b.HasOne("Accessibility_app.Models.Beperking", "Beperking")
+                        .WithMany("Aandoeningen")
+                        .HasForeignKey("BeperkingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Beperking");
+                });
+
             modelBuilder.Entity("Accessibility_app.Models.Antwoord", b =>
                 {
                     b.HasOne("Accessibility_app.Models.Gebruiker", "Gebruiker")
@@ -792,13 +904,6 @@ namespace Accessibility_backend.Migrations
                     b.Navigation("Gebruiker");
 
                     b.Navigation("Vraag");
-                });
-
-            modelBuilder.Entity("Accessibility_app.Models.Beperking", b =>
-                {
-                    b.HasOne("Accessibility_app.Models.Onderzoek", null)
-                        .WithMany("Beperkingen")
-                        .HasForeignKey("OnderzoekId");
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Bericht", b =>
@@ -871,10 +976,6 @@ namespace Accessibility_backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Accessibility_app.Models.Medewerker", null)
-                        .WithMany("OnderzoekenLijst")
-                        .HasForeignKey("MedewerkerId");
-
                     b.HasOne("Accessibility_app.Models.TypeOnderzoek", "TypeOnderzoek")
                         .WithMany()
                         .HasForeignKey("TypeOnderzoekId")
@@ -901,7 +1002,7 @@ namespace Accessibility_backend.Migrations
                         .HasForeignKey("VragenlijstId");
                 });
 
-            modelBuilder.Entity("BeperkingErvaringsdeskundige", b =>
+            modelBuilder.Entity("BeperkingOnderzoek", b =>
                 {
                     b.HasOne("Accessibility_app.Models.Beperking", null)
                         .WithMany()
@@ -909,9 +1010,9 @@ namespace Accessibility_backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Accessibility_app.Models.Ervaringsdeskundige", null)
+                    b.HasOne("Accessibility_app.Models.Onderzoek", null)
                         .WithMany()
-                        .HasForeignKey("ErvaringsdeskundigenId")
+                        .HasForeignKey("OnderzoekenId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1045,6 +1146,11 @@ namespace Accessibility_backend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Accessibility_app.Models.Beperking", b =>
+                {
+                    b.Navigation("Aandoeningen");
+                });
+
             modelBuilder.Entity("Accessibility_app.Models.Chat", b =>
                 {
                     b.Navigation("Berichten");
@@ -1053,11 +1159,6 @@ namespace Accessibility_backend.Migrations
             modelBuilder.Entity("Accessibility_app.Models.Gebruiker", b =>
                 {
                     b.Navigation("Berichten");
-                });
-
-            modelBuilder.Entity("Accessibility_app.Models.Onderzoek", b =>
-                {
-                    b.Navigation("Beperkingen");
                 });
 
             modelBuilder.Entity("Accessibility_app.Models.Vragenlijst", b =>
@@ -1078,8 +1179,6 @@ namespace Accessibility_backend.Migrations
             modelBuilder.Entity("Accessibility_app.Models.Medewerker", b =>
                 {
                     b.Navigation("ChatLijst");
-
-                    b.Navigation("OnderzoekenLijst");
                 });
 #pragma warning restore 612, 618
         }

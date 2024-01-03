@@ -39,12 +39,8 @@ namespace Accessibility_app.Controllers
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] RegisterDeveloper model)
         {
-<<<<<<< HEAD
             var user = await _userManager.FindByEmailAsync(model.Email);
-=======
-            var user = await _userManager.FindByNameAsync(model.Email);
 
->>>>>>> main
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Wachtwoord))
             {
                 var userRoles = await _userManager.GetRolesAsync(user);
@@ -73,13 +69,9 @@ namespace Accessibility_app.Controllers
 
         //registratie vereist een goede wachtwoord: 1 hoofdletter, cijfer en rare teken
         [HttpPost]
-<<<<<<< HEAD
-        [Route("register-developer")]
-        public async Task<IActionResult> Register([FromBody] registerDeveloper model)
-=======
+
         [Route("registreer-beheerder")]
         public async Task<IActionResult> RegistreerBeheerder([FromBody] RegisterDeveloper model)
->>>>>>> main
         {
 
             var userExists = await _userManager.FindByNameAsync(model.Email);
@@ -91,13 +83,8 @@ namespace Accessibility_app.Controllers
             {
                 UserName = model.Email,
                 Email = model.Email,
-<<<<<<< HEAD
-                Geverifieerd = true,
-                Wachtwoord = model.Wachtwoord,
-=======
                 Rol = rol,
                 EmailConfirmed = true
->>>>>>> main
             };
             var result = await _userManager.CreateAsync(user);
             if (!result.Succeeded)

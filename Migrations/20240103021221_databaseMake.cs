@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Accessibility_backend.Migrations
 {
-    public partial class initialize : Migration
+    public partial class databaseMake : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -625,11 +625,11 @@ namespace Accessibility_backend.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Naam", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { 1, "f84ec442-8c52-4acf-b9f3-f9490981052a", "Developer", null, null },
-                    { 2, "196eb593-64c8-4e42-b65d-10cda3060053", "Beheerder", null, null },
-                    { 3, "1bd01c14-4a5e-41eb-b361-a6fd95bcc43c", "Medewerker", null, null },
-                    { 4, "fbd81272-d7cb-4bd0-a759-1342a6535ac8", "Ervaringsdeskundige", null, null },
-                    { 5, "098d8f05-bf20-45fb-8ead-b813c402eab5", "Bedrijf", null, null }
+                    { 1, "f3e3886a-0e05-4a60-b8fa-4bcb217af3de", "Developer", null, null },
+                    { 2, "e9005cde-8195-4a0f-80a1-1daf34a266f8", "Beheerder", null, null },
+                    { 3, "7313075c-0376-44d6-b3b0-589c05194886", "Medewerker", null, null },
+                    { 4, "7b474d50-6a3a-42e4-a22c-4749b090828d", "Ervaringsdeskundige", null, null },
+                    { 5, "adf80090-4a73-4d3a-b12f-90b6f082620d", "Bedrijf", null, null }
                 });
 
             migrationBuilder.InsertData(
