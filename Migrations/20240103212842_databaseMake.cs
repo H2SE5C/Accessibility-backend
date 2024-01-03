@@ -143,7 +143,7 @@ namespace Accessibility_backend.Migrations
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -625,11 +625,11 @@ namespace Accessibility_backend.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Naam", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { 1, "f3e3886a-0e05-4a60-b8fa-4bcb217af3de", "Developer", null, null },
-                    { 2, "e9005cde-8195-4a0f-80a1-1daf34a266f8", "Beheerder", null, null },
-                    { 3, "7313075c-0376-44d6-b3b0-589c05194886", "Medewerker", null, null },
-                    { 4, "7b474d50-6a3a-42e4-a22c-4749b090828d", "Ervaringsdeskundige", null, null },
-                    { 5, "adf80090-4a73-4d3a-b12f-90b6f082620d", "Bedrijf", null, null }
+                    { 1, "451e1f52-1e27-47b3-9a67-8c080ebd5e18", "Developer", "Developer", null },
+                    { 2, "b1983bdd-e7cf-4be6-90dd-df0100db7eb8", "Beheerder", null, null },
+                    { 3, "c72fe0cc-2afe-45d4-939a-c155c96fbfe5", "Medewerker", null, null },
+                    { 4, "a37909dd-7ae3-4dbc-9a14-926f27e660b1", "Ervaringsdeskundige", null, null },
+                    { 5, "04fe490e-1f10-4179-8617-de966f1976ff", "Bedrijf", null, null }
                 });
 
             migrationBuilder.InsertData(

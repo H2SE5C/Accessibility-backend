@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -49,35 +50,9 @@ namespace Accessibility_app.Controllers
                  return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Wachtwoord fout" });
             };
                 
-
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Wachtwoord))
-             
             {
-                var roleExists = await _roleManager.RoleExistsAsync("Developer");
-                if (!roleExists)
-                {
-                    // 如果角色不存在，则创建角色
-                    var roleName = "Developer";
-                    Console.WriteLine($"Role Name: {roleName}");
-                    var role = new Rol { Naam = roleName };
-                    Console.WriteLine($"Role Name2: {role.Naam}");
-                    var res1 = await _roleManager.CreateAsync(role);
-                    if (!res1.Succeeded)
-                    {
-                        foreach (var error in res1.Errors)
-                        {
-                            Console.WriteLine($"Error: {error.Code}, Description: {error.Description}");
-                        }
-
-                        // 处理无法创建角色的情况
-                        return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Unable to create role" });
-                    }
-
-                    await _userManager.AddToRoleAsync(user, role.Naam);
-                }
-
                 var userRoles = await _userManager.GetRolesAsync(user);
-               
                 var authClaims = new List<Claim>
                 {
                     new (ClaimTypes.Email, user.Email),
@@ -87,7 +62,6 @@ namespace Accessibility_app.Controllers
                 foreach (var userRole in userRoles)
                 {
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-                    
                 }
 
                 var token = GetToken(authClaims);
@@ -106,16 +80,42 @@ namespace Accessibility_app.Controllers
         //registratie vereist een goede wachtwoord: 1 hoofdletter, cijfer en rare teken
         [HttpPost]
 
-        [Route("registreer-beheerder")]
+        [HttpPost("registreer-beheerder")]
         public async Task<IActionResult> RegistreerBeheerder([FromBody] RegisterDeveloper model)
         {
+            var roleName = "Beheerder";
+            await RegisterUserWithRole(model, roleName);
+            return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+        }
 
-           
+        [HttpPost("registreer-developer")]
+        public async Task<IActionResult> RegistreerDeveloper([FromBody] RegisterDeveloper model)
+        {
+            var roleName = "Developer";
+            await RegisterUserWithRole(model, roleName);
+            return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+        }
+
+        private async Task RegisterUserWithRole(RegisterDeveloper model, string roleName)
+        {
             var userExists = await _userManager.FindByNameAsync(model.Email);
             if (userExists != null)
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
+            {
+                throw new Exception("User already exists!");
+            }
 
-            var rol = await _context.Rollen.FindAsync(2);
+            var roleExists = await _roleManager.RoleExistsAsync(roleName);
+            var role = new Rol { Naam = roleName, Name = roleName };
+            if (!roleExists)
+            {
+                var res = await _roleManager.CreateAsync(role);
+                if (!res.Succeeded)
+                {
+                    throw new Exception("Role creation failed!");
+                }
+            }
+
+            var rol = await _context.Rollen.FirstOrDefaultAsync(r => r.Naam == roleName);
             Gebruiker user = new()
             {
                 UserName = model.Email,
@@ -123,21 +123,19 @@ namespace Accessibility_app.Controllers
                 Rol = rol,
                 EmailConfirmed = true
             };
-            var result = await _userManager.CreateAsync(user,model.Wachtwoord);
+
+            var result = await _userManager.CreateAsync(user, model.Wachtwoord);
             if (!result.Succeeded)
             {
                 var exceptionText = result.Errors.Aggregate("User Creation Failed - Identity Exception. Errors were: \n\r\n\r", (current, error) => current + (" - " + error + "\n\r"));
                 throw new Exception(exceptionText);
-                /*return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });*/
             }
 
-
-            return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+            await _userManager.AddToRoleAsync(user, roleName);
         }
 
 
-
-        [HttpDelete("{id}")]
+    [HttpDelete("{id}")]
         public async Task<IActionResult> VerwijderenGeberuiker(string id)
         {
             var user = await _userManager.FindByIdAsync(id);

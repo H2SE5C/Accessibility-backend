@@ -50,14 +50,6 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 			.HasForeignKey(b => b.OntvangerId)
 			.OnDelete(DeleteBehavior.Restrict);
 
-		builder.Entity<Rol>().HasData(
-			new Rol { Id = 1, Naam = "Developer" ,Name = "Developer" },
-            new Rol { Id = 2, Naam = "Beheerder" },
-            new Rol { Id = 3, Naam = "Medewerker" },
-            new Rol { Id = 4, Naam = "Ervaringsdeskundige" },
-            new Rol { Id = 5, Naam = "Bedrijf" }
-			);
-
 		builder.Entity<Beperking>().HasData(
 			new { Id = 1, Naam = "Visueel" },
 			new { Id = 2, Naam = "Auditief" },
