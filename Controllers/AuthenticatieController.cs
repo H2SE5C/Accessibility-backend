@@ -6,6 +6,7 @@ using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -24,7 +25,9 @@ namespace Accessibility_app.Controllers
         private readonly RoleManager<Rol> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
+        private List<Rol> rollen = new List<Rol>();
 
+       
         public AuthenticatieController(
             UserManager<Gebruiker> userManager,
             RoleManager<Rol> roleManager,
@@ -35,6 +38,7 @@ namespace Accessibility_app.Controllers
             _roleManager = roleManager;
             _configuration = configuration;
         }
+ 
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
@@ -82,6 +86,7 @@ namespace Accessibility_app.Controllers
         public async Task<IActionResult> RegistreerBeheerder([FromBody] RegisterDeveloper model)
         {
 
+           
             var userExists = await _userManager.FindByNameAsync(model.Email);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
@@ -101,7 +106,39 @@ namespace Accessibility_app.Controllers
                 throw new Exception(exceptionText);
                 /*return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });*/
             }
+
+            if (!await _roleManager.RoleExistsAsync(rol.Name))
+            {
+                await _roleManager.CreateAsync(rol);
+            }
+            if (!await _roleManager.RoleExistsAsync(rol.Name))
+            {
+                await _userManager.AddToRoleAsync(user, rol.Name);
+            }
+
             return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> VerwijderenGeberuiker(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+
+            if (result.Succeeded)
+            {
+                return Ok("User deleted successfully");
+            }
+            else
+            {
+                return BadRequest("Failed to delete user");
+            }
         }
 
         /* [HttpPost]
