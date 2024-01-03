@@ -51,7 +51,7 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 			.OnDelete(DeleteBehavior.Restrict);
 
 		builder.Entity<Rol>().HasData(
-			new Rol { Id = 1, Naam = "Developer" },
+			new Rol { Id = 1, Naam = "Developer" ,Name = "Developer" },
             new Rol { Id = 2, Naam = "Beheerder" },
             new Rol { Id = 3, Naam = "Medewerker" },
             new Rol { Id = 4, Naam = "Ervaringsdeskundige" },

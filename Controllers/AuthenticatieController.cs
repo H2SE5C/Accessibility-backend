@@ -25,7 +25,6 @@ namespace Accessibility_app.Controllers
         private readonly RoleManager<Rol> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
-        private List<Rol> rollen = new List<Rol>();
 
        
         public AuthenticatieController(
@@ -52,10 +51,33 @@ namespace Accessibility_app.Controllers
                 
 
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Wachtwoord))
-
+             
             {
-                var userRoles = await _userManager.GetRolesAsync(user);
+                var roleExists = await _roleManager.RoleExistsAsync("Developer");
+                if (!roleExists)
+                {
+                    // 如果角色不存在，则创建角色
+                    var roleName = "Developer";
+                    Console.WriteLine($"Role Name: {roleName}");
+                    var role = new Rol { Naam = roleName };
+                    Console.WriteLine($"Role Name2: {role.Naam}");
+                    var res1 = await _roleManager.CreateAsync(role);
+                    if (!res1.Succeeded)
+                    {
+                        foreach (var error in res1.Errors)
+                        {
+                            Console.WriteLine($"Error: {error.Code}, Description: {error.Description}");
+                        }
 
+                        // 处理无法创建角色的情况
+                        return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Unable to create role" });
+                    }
+
+                    await _userManager.AddToRoleAsync(user, role.Naam);
+                }
+
+                var userRoles = await _userManager.GetRolesAsync(user);
+               
                 var authClaims = new List<Claim>
                 {
                     new (ClaimTypes.Email, user.Email),
@@ -65,6 +87,7 @@ namespace Accessibility_app.Controllers
                 foreach (var userRole in userRoles)
                 {
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                    
                 }
 
                 var token = GetToken(authClaims);
@@ -72,7 +95,8 @@ namespace Accessibility_app.Controllers
                 return Ok(new
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo
+                    expiration = token.ValidTo,
+                    userRol = userRoles,
                 });
             }
            
@@ -107,17 +131,11 @@ namespace Accessibility_app.Controllers
                 /*return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });*/
             }
 
-            if (!await _roleManager.RoleExistsAsync(rol.Name))
-            {
-                await _roleManager.CreateAsync(rol);
-            }
-            if (!await _roleManager.RoleExistsAsync(rol.Name))
-            {
-                await _userManager.AddToRoleAsync(user, rol.Name);
-            }
 
             return Ok(new Response { Status = "Success", Message = "User created successfully!" });
         }
+
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> VerwijderenGeberuiker(string id)
