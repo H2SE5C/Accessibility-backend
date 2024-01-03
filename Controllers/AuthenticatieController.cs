@@ -33,7 +33,7 @@ namespace Accessibility_app.Controllers
         }
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        public async Task<IActionResult> Login([FromBody] Gebruiker model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Wachtwoord))
@@ -76,7 +76,7 @@ namespace Accessibility_app.Controllers
                 Geverifieerd = true,
                 Wachtwoord = model.Wachtwoord,
             };
-            var result = await _userManager.CreateAsync(user, model.Wachtwoord);
+            var result = await _userManager.CreateAsync(user);
             if (!result.Succeeded)
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
 
