@@ -1,10 +1,12 @@
 ﻿using Accessibility_backend;
+using Accessibility_backend.Modellen.Extra;
 using Accessibility_backend.Modellen.Registreermodellen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Accessibility_app.Controllers;
-[Authorize(Roles = UserRoles.User )]
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class WeatherForecastController : ControllerBase

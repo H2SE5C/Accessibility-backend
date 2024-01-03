@@ -3,10 +3,11 @@ namespace Accessibility_backend.Modellen.Registreermodellen
 {
     public class LoginModel
     {
-        [Required(ErrorMessage = "User Name is required")]
-        public string? Username { get; set; }
+        [EmailAddress]
+        [Required(ErrorMessage = "Email is required")]
+        public string? Email { get; set; }
 
-        [Required(ErrorMessage = "Password is required")]
-        public string? Password { get; set; }
+        [Required(ErrorMessage = "Wachtwoord is required")]
+        public string? Wachtwoord { get; set; }
     }
 }

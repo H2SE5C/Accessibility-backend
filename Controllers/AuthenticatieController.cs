@@ -37,11 +37,18 @@ namespace Accessibility_app.Controllers
         }
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login([FromBody] RegisterDeveloper model)
+        public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null) { return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User null" }); };
+            if (!await _userManager.CheckPasswordAsync(user, model.Wachtwoord))
+            {
+                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Wachtwoord fout" });
+            };
+                
 
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Wachtwoord))
+
             {
                 var userRoles = await _userManager.GetRolesAsync(user);
 
@@ -64,6 +71,7 @@ namespace Accessibility_app.Controllers
                     expiration = token.ValidTo
                 });
             }
+           
             return Unauthorized();
         }
 
@@ -86,7 +94,7 @@ namespace Accessibility_app.Controllers
                 Rol = rol,
                 EmailConfirmed = true
             };
-            var result = await _userManager.CreateAsync(user);
+            var result = await _userManager.CreateAsync(user,model.Wachtwoord);
             if (!result.Succeeded)
             {
                 var exceptionText = result.Errors.Aggregate("User Creation Failed - Identity Exception. Errors were: \n\r\n\r", (current, error) => current + (" - " + error + "\n\r"));
