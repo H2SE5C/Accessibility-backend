@@ -110,7 +110,6 @@ namespace Accessibility_app.Controllers
 			"postcode": "2224GE",
 			"minderjarig": false,
 			"telefoonnummer": "0684406262",
-			"commercerciële": true,
 			"aandoeningen" : [
 			{
 			      "id": 2,
