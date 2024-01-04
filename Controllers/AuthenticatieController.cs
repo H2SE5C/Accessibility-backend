@@ -136,7 +136,7 @@ namespace Accessibility_app.Controllers
 
 
     [HttpDelete("{id}")]
-        public async Task<IActionResult> VerwijderenGeberuiker(string id)
+        public async Task<IActionResult> VerwijderGebruiker(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
 
