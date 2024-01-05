@@ -2,6 +2,7 @@
 using Accessibility_app.Models;
 using Accessibility_backend;
 using Accessibility_backend.Modellen;
+using Accessibility_backend.Modellen.Extra;
 using Accessibility_backend.Modellen.Registreermodellen;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -100,104 +101,7 @@ namespace Accessibility_app.Controllers
 			return NotFound();
 		}
 
-		// POST api/<ErvaringsdeskundigeController>
-		//voorbeeld:
-		/*{
-			"voornaam": "Dude",
-			"achternaam": "Awesome",
-			"wachtwoord": "String123@",
-			"email": "Killer@example.com",
-			"postcode": "2224GE",
-			"minderjarig": false,
-			"telefoonnummer": "0684406262",
-			"aandoeningen" : [
-			{
-			      "id": 2,
-			      "naam": "Slechtziendheid"
-			},
-		    {
-			      "id": 4,
-			     "naam": "ADHD"
-			}
-			],
-			"typeOnderzoeken": [
-			{
-				"id": 1,
-				"naam": "Vragenlijst"
-			}
-			],
-			"voorkeurBenadering": "geen voorkeur",
-			"commerciële": false
-			}*/
-		[HttpPost]
-        public async Task<IActionResult> RegistreerErvaringsdeskundige([FromBody] RegisterModel model)
-        {
-			var userExists = await _userManager.FindByEmailAsync(model.Email);
-			var rol = await _context.Rollen.Where(r => r.Naam == "Ervaringsdeskundige").FirstAsync();
-			var Hulpmiddelen = _context.Hulpmiddelen.Where(a => model.Hulpmiddelen.Select(aa => aa.Id).Contains(a.Id)).ToList();
-			var Aandoeningen = _context.Aandoeningen.Where(a => model.Aandoeningen.Select(aa => aa.Id).Contains(a.Id)).ToList();
-			var TypeOnderzoeken = _context.TypeOnderzoeken.Where(t => model.TypeOnderzoeken.Select(to => to.Id).Contains(t.Id)).ToList();
-
-			Voogd Voogd = null;
-
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
-			
-			if (userExists != null)
-				return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
-			
-			if (model.Minderjarig) {
-				Voogd = await _context.Voogden.Where(v => v.Email == model.VoogdEmail).FirstOrDefaultAsync();
-				if (Voogd == null) {
-					Voogd = new ()
-					{
-						Voornaam = model.VoogdVoornaam,
-						Achternaam = model.VoogdAchternaam,
-						Email = model.VoogdEmail,
-						Telefoonnummer = model.VoogdTelefoonnummer
-					};
-
-					await _context.Voogden.AddAsync(Voogd);
-					await _context.SaveChangesAsync();
-				}
-			}
-			Ervaringsdeskundige ervaringsdeskundige = new()
-			{
-				Voornaam = model.Voornaam,
-				Achternaam = model.Achternaam,
-				Postcode = model.Postcode,
-				Minderjarig = model.Minderjarig,
-				PhoneNumber = model.Telefoonnummer,
-				Hulpmiddelen = Hulpmiddelen,
-				Aandoeningen = Aandoeningen,
-				VoorkeurBenadering = model.VoorkeurBenadering,
-				TypeOnderzoeken = TypeOnderzoeken,
-				UserName = model.Email,
-				Commercerciële = model.Commercerciële,
-				Email = model.Email,
-				Rol = rol,
-				Voogd = Voogd
-		    };
-			
-			var result = await _userManager.CreateAsync(ervaringsdeskundige, model.Wachtwoord);
-			if (!result.Succeeded)
-			{
-				var exceptionText = result.Errors.Aggregate("User Creation Failed - Identity Exception. Errors were: \n\r\n\r", (current, error) => current + (" - " + error + "\n\r"));
-				throw new Exception(exceptionText);
-				/*return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });*/
-			}
-
-			//email verzend stuk kan ook misschien een methode worden?
-			var token = await _userManager.GenerateEmailConfirmationTokenAsync(ervaringsdeskundige);
-			var link = Url.Action(nameof(VerifieerEmail), "Ervaringsdeskundige", new { token, email = ervaringsdeskundige.Email }, Request.Scheme);
-			await _emailSender.SendEmailAsync(ervaringsdeskundige.Email, "verifieer email accessibility", link);
-
-			/*	await _userManager.AddToRoleAsync(ervaringsdeskundige, "Ervaringsdeskundige");*/
-			return Ok(new Response { Status = "Success", Message = "Er is een verificatie email verstuurd naar: "+ervaringsdeskundige.Email+"!" });
-		}
-
+		
         // PUT api/<ErvaringsdeskundigeController>/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
