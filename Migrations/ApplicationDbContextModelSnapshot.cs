@@ -594,39 +594,6 @@ namespace Accessibility_backend.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ConcurrencyStamp = "451e1f52-1e27-47b3-9a67-8c080ebd5e18",
-                            Naam = "Developer",
-                            Name = "Developer"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ConcurrencyStamp = "b1983bdd-e7cf-4be6-90dd-df0100db7eb8",
-                            Naam = "Beheerder"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ConcurrencyStamp = "c72fe0cc-2afe-45d4-939a-c155c96fbfe5",
-                            Naam = "Medewerker"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ConcurrencyStamp = "a37909dd-7ae3-4dbc-9a14-926f27e660b1",
-                            Naam = "Ervaringsdeskundige"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            ConcurrencyStamp = "04fe490e-1f10-4179-8617-de966f1976ff",
-                            Naam = "Bedrijf"
-                        });
                 });
 
             modelBuilder.Entity("BeperkingOnderzoek", b =>

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Accessibility_backend.Migrations
 {
-    public partial class databaseMake : Migration
+    public partial class DatabaseMake : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -293,10 +293,10 @@ namespace Accessibility_backend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
-                    Locatie = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LinkNaarBedrijf = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Bedrijfsnaam = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Omschrijving = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Omschrijving = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Locatie = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LinkNaarBedrijf = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -618,18 +618,6 @@ namespace Accessibility_backend.Migrations
                         principalTable: "Chat",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Naam", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { 1, "451e1f52-1e27-47b3-9a67-8c080ebd5e18", "Developer", "Developer", null },
-                    { 2, "b1983bdd-e7cf-4be6-90dd-df0100db7eb8", "Beheerder", null, null },
-                    { 3, "c72fe0cc-2afe-45d4-939a-c155c96fbfe5", "Medewerker", null, null },
-                    { 4, "a37909dd-7ae3-4dbc-9a14-926f27e660b1", "Ervaringsdeskundige", null, null },
-                    { 5, "04fe490e-1f10-4179-8617-de966f1976ff", "Bedrijf", null, null }
                 });
 
             migrationBuilder.InsertData(
