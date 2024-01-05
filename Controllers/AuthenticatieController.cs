@@ -1,6 +1,5 @@
 ﻿using Accessibility_app.Data;
 using Accessibility_app.Models;
-using Accessibility_backend;
 using Accessibility_backend.Modellen.Extra;
 using Accessibility_backend.Modellen.Registreermodellen;
 using Azure;
@@ -27,34 +26,17 @@ namespace Accessibility_app.Controllers
         private readonly RoleManager<Rol> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
-        private readonly IEmailSender _emailSender;
 
 
         public AuthenticatieController(
             UserManager<Gebruiker> userManager,
             RoleManager<Rol> roleManager,
-            IConfiguration configuration, 
-            ApplicationDbContext applicationDbContext, 
-            IEmailSender emailSender
-            )
+            IConfiguration configuration, ApplicationDbContext applicationDbContext)
         {
             _context = applicationDbContext;
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
-            _emailSender = emailSender; _emailSender = emailSender;
-        }
-
-        //dit kan ergens anders zodat bedrijf het ook kan gebruiken misschien? idk
-        [HttpGet("/verifieer/test")]
-        public async Task<IActionResult> VerifieerEmail(string token, string email)
-        {
-            var gebruiker = await _userManager.FindByEmailAsync(email);
-            if (gebruiker == null)
-                return BadRequest();
-
-            await _userManager.ConfirmEmailAsync(gebruiker, token);
-            return Ok("Geverifieerd! U kan dit venster sluiten.");
         }
 
         [HttpPost]
@@ -62,37 +44,44 @@ namespace Accessibility_app.Controllers
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null) { return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User null" }); };
+            if (user == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Geen gebruiker gevonden" });
+            };
+            if (!user.EmailConfirmed)
+            {
+                return Unauthorized(new Response { Status = "Error", Message = "Verifieer email eerst!" });
+            }
             if (!await _userManager.CheckPasswordAsync(user, model.Wachtwoord))
             {
-                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Wachtwoord fout" });
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Wachtwoord fout" });
             };
-                
-            if (user != null && await _userManager.CheckPasswordAsync(user, model.Wachtwoord))
-            {
-                var userRoles = await _userManager.GetRolesAsync(user);
-                var authClaims = new List<Claim>
+
+            /*if (user != null && await _userManager.CheckPasswordAsync(user, model.Wachtwoord))
+            {*/
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var authClaims = new List<Claim>
                 {
+                    new (ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new (ClaimTypes.Email, user.Email),
-                    new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 };
 
-                foreach (var userRole in userRoles)
-                {
-                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-                }
-
-                var token = GetToken(authClaims);
-
-                return Ok(new
-                {
-                    token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo,
-                    userRol = userRoles,
-                });
+            foreach (var userRole in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
             }
-           
-            return Unauthorized();
+
+            var token = GetToken(authClaims);
+
+            return Ok(new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                expiration = token.ValidTo,
+                userRol = userRoles,
+            });
+            /* }
+			 return Unauthorized();*/
         }
 
         //registratie vereist een goede wachtwoord: 1 hoofdletter, cijfer en rare teken
@@ -113,118 +102,6 @@ namespace Accessibility_app.Controllers
             await RegisterUserWithRole(model, roleName);
             return Ok(new Response { Status = "Success", Message = "User created successfully!" });
         }
-
-        // POST api/<Ervaringsdeskundige>
-        //voorbeeld:
-        /*{
-			"voornaam": "Dude",
-			"achternaam": "Awesome",
-			"wachtwoord": "String123@",
-			"email": "Killer@example.com",
-			"postcode": "2224GE",
-			"minderjarig": false,
-			"telefoonnummer": "0684406262",
-			"aandoeningen" : [
-			{
-			      "id": 2,
-			      "naam": "Slechtziendheid"
-			},
-		    {
-			      "id": 4,
-			     "naam": "ADHD"
-			}
-			],
-			"typeOnderzoeken": [
-			{
-				"id": 1,
-				"naam": "Vragenlijst"
-			}
-			],
-			"voorkeurBenadering": "geen voorkeur",
-			"commerciële": false
-			}*/
-        [HttpPost("registreer-ed")]
-        public async Task<IActionResult> RegistreerErvaringsdeskundige([FromBody] RegisterModel model)
-        {
-            var roleName = "Ervaringsdeskundige";
-            var roleExists = await _roleManager.RoleExistsAsync(roleName);
-            var role = new Rol { Naam = roleName, Name = roleName };
-            if (!roleExists)
-            {
-                var res = await _roleManager.CreateAsync(role);
-                if (!res.Succeeded)
-                {
-                    throw new Exception("Role creation failed!");
-                }
-            }
-
-
-            var userExists = await _userManager.FindByEmailAsync(model.Email);
-			var rol = await _context.Rollen.Where(r => r.Naam == "Ervaringsdeskundige").FirstAsync();
-			var Hulpmiddelen = _context.Hulpmiddelen.Where(a => model.Hulpmiddelen.Select(aa => aa.Id).Contains(a.Id)).ToList();
-			var Aandoeningen = _context.Aandoeningen.Where(a => model.Aandoeningen.Select(aa => aa.Id).Contains(a.Id)).ToList();
-			var TypeOnderzoeken = _context.TypeOnderzoeken.Where(t => model.TypeOnderzoeken.Select(to => to.Id).Contains(t.Id)).ToList();
-
-			Voogd Voogd = null;
-
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
-			
-			if (userExists != null)
-				return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
-			
-			if (model.Minderjarig) {
-				Voogd = await _context.Voogden.Where(v => v.Email == model.VoogdEmail).FirstOrDefaultAsync();
-				if (Voogd == null) {
-					Voogd = new ()
-					{
-						Voornaam = model.VoogdVoornaam,
-						Achternaam = model.VoogdAchternaam,
-						Email = model.VoogdEmail,
-						Telefoonnummer = model.VoogdTelefoonnummer
-					};
-
-					await _context.Voogden.AddAsync(Voogd);
-					await _context.SaveChangesAsync();
-				}
-			}
-			Ervaringsdeskundige ervaringsdeskundige = new()
-			{
-				Voornaam = model.Voornaam,
-				Achternaam = model.Achternaam,
-				Postcode = model.Postcode,
-				Minderjarig = model.Minderjarig,
-				PhoneNumber = model.Telefoonnummer,
-				Hulpmiddelen = Hulpmiddelen,
-				Aandoeningen = Aandoeningen,
-				VoorkeurBenadering = model.VoorkeurBenadering,
-				TypeOnderzoeken = TypeOnderzoeken,
-				UserName = model.Email,
-				Commercerciële = model.Commercerciële,
-				Email = model.Email,
-				Rol = rol,
-				Voogd = Voogd
-		    };
-			
-			var result = await _userManager.CreateAsync(ervaringsdeskundige, model.Wachtwoord);
-			if (!result.Succeeded)
-			{
-				var exceptionText = result.Errors.Aggregate("User Creation Failed - Identity Exception. Errors were: \n\r\n\r", (current, error) => current + (" - " + error + "\n\r"));
-				throw new Exception(exceptionText);
-				/*return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });*/
-			}
-
-			//email verzend stuk kan ook misschien een methode worden?
-			var token = await _userManager.GenerateEmailConfirmationTokenAsync(ervaringsdeskundige);
-			var link = Url.Action(nameof(VerifieerEmail), "Ervaringsdeskundige", new { token, email = ervaringsdeskundige.Email }, Request.Scheme);
-			await _emailSender.SendEmailAsync(ervaringsdeskundige.Email, "verifieer email accessibility", link);
-            await _userManager.AddToRoleAsync(ervaringsdeskundige, roleName);
-            /*	await _userManager.AddToRoleAsync(ervaringsdeskundige, "Ervaringsdeskundige");*/
-            return Ok(new Response { Status = "Success", Message = "Er is een verificatie email verstuurd naar: "+ervaringsdeskundige.Email+"!" });
-		}
-
 
         private async Task RegisterUserWithRole(RegisterDeveloper model, string roleName)
         {
@@ -265,8 +142,8 @@ namespace Accessibility_app.Controllers
         }
 
 
-    [HttpDelete("{id}")]
-        public async Task<IActionResult> VerwijderenGeberuiker(string id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> VerwijderGebruiker(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
 
@@ -336,13 +213,13 @@ namespace Accessibility_app.Controllers
             return token;
         }
 
-       /* [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> ConfirmEmail(string userId, string token)
-        {
-            if (userId == null || token == null) { 
-                return NotFound();
-            }
-        }*/
+        /* [HttpGet]
+		 [AllowAnonymous]
+		 public async Task<IActionResult> ConfirmEmail(string userId, string token)
+		 {
+			 if (userId == null || token == null) { 
+				 return NotFound();
+			 }
+		 }*/
     }
 }
