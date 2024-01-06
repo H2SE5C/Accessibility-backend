@@ -29,7 +29,7 @@ namespace Accessibility_app.Controllers
 		[HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-			var gebruiker = _context.Gebruikers.Where(g => g.Id == id).First();
+			var gebruiker = await _context.Gebruikers.Where(g => g.Id == id).FirstAsync();
 
 			if (gebruiker != null)
 			{

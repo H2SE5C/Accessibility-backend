@@ -117,7 +117,7 @@ public class AuthenticatieController : ControllerBase
     }
 
 
-    [HttpPost("registreer-Medewerker")]
+    [HttpPost("registreer-medewerker")]
     public async Task<IActionResult> RegistreerMedewerker([FromBody] RegistrerenMedewerkers model)
     {
         var rolNaam = "Medewerker";
@@ -127,7 +127,7 @@ public class AuthenticatieController : ControllerBase
             throw new Exception("User already exists!");
         }
 
-        var rol = await rolMaak(rolNaam);
+        var rol = await RolMaak(rolNaam);
 
         Medewerker medewerker = new()
         {
@@ -161,7 +161,7 @@ public class AuthenticatieController : ControllerBase
         "Link": "https://www.ah.nl/?gad_source=1&gclid=CjwKCAiA7t6sBhAiEiwAsaieYoHEM-7ASRzYNpFhpGe3o3Q7bwtwR4_96ouq7Q_cLXJEli9IenU3EhoCB_MQAvD_BwE"
 
         }*/
-    [HttpPost("registreer-Bederijf")]
+    [HttpPost("registreer-bedrijf")]
     public async Task<IActionResult> RegistreerBedrijf([FromBody] RegistrerenBedrijf model)
     {
         var rolNaam = "Bedrijf";
@@ -171,7 +171,7 @@ public class AuthenticatieController : ControllerBase
             throw new Exception("User already exists!");
         }
 
-        var rol = await rolMaak(rolNaam);
+        var rol = await RolMaak(rolNaam);
 
         Bedrijf bedrijf = new()
         {
@@ -182,7 +182,7 @@ public class AuthenticatieController : ControllerBase
             LinkNaarBedrijf = model.LinkNaarBedrijf,
             Email = model.Email,
             Rol = rol,
-            EmailConfirmed = true
+            /*EmailConfirmed = true*/
         };
 
         var result = await _userManager.CreateAsync(bedrijf, model.Wachtwoord);
@@ -230,7 +230,7 @@ public class AuthenticatieController : ControllerBase
     {
 
         var userExists = await _userManager.FindByEmailAsync(model.Email);
-        var rol = await rolMaak("Ervaringsdeskundige");
+        var rol = await RolMaak("Ervaringsdeskundige");
         var Hulpmiddelen = _context.Hulpmiddelen.Where(a => model.Hulpmiddelen.Select(aa => aa.Id).Contains(a.Id)).ToList();
         var Aandoeningen = _context.Aandoeningen.Where(a => model.Aandoeningen.Select(aa => aa.Id).Contains(a.Id)).ToList();
         var TypeOnderzoeken = _context.TypeOnderzoeken.Where(t => model.TypeOnderzoeken.Select(to => to.Id).Contains(t.Id)).ToList();
@@ -274,7 +274,7 @@ public class AuthenticatieController : ControllerBase
             VoorkeurBenadering = model.VoorkeurBenadering,
             TypeOnderzoeken = TypeOnderzoeken,
             UserName = model.Email,
-            Commercerciële = model.Commercerciële,
+            Commerciële = model.Commerciële,
             Email = model.Email,
             Rol = rol,
             Voogd = Voogd
@@ -291,20 +291,21 @@ public class AuthenticatieController : ControllerBase
         //email verzend stuk kan ook misschien een methode worden?
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(ervaringsdeskundige);
         var link = Url.Action(nameof(VerifieerEmail), "Authenticatie", new { token, email = ervaringsdeskundige.Email }, Request.Scheme);
-        await _emailSender.SendEmailAsync(ervaringsdeskundige.Email, "verifieer email accessibility", link);
+        await _emailSender.SendEmailAsync(ervaringsdeskundige.Email, "Verifieer email - Accessibility", link);
         await _userManager.AddToRoleAsync(ervaringsdeskundige, "Ervaringsdeskundige");
         /*	await _userManager.AddToRoleAsync(ervaringsdeskundige, "Ervaringsdeskundige");*/
         return Ok(new Response { Status = "Success", Message = "Er is een verificatie email verstuurd naar: " + ervaringsdeskundige.Email + "!" });
     }
 
    
-    private async Task<Rol> rolMaak(string rolNaam) 
+    private async Task<Rol> RolMaak(string rolNaam) 
     {
+        //kan je gewoon niet var rol gebruiken om te checken of rol al bestaat? if (!rol) {}
         var roleExists = await _roleManager.RoleExistsAsync(rolNaam);
-        var role = new Rol { Naam = rolNaam, Name = rolNaam };
         if (!roleExists)
         {
-            var res = await _roleManager.CreateAsync(role);
+			var role = new Rol { Naam = rolNaam, Name = rolNaam };
+			var res = await _roleManager.CreateAsync(role);
             if (!res.Succeeded)
             {
                 throw new Exception("Role creation failed!");
@@ -322,7 +323,7 @@ public class AuthenticatieController : ControllerBase
         throw new Exception("User already exists!");
     }
 
-    var rol = await rolMaak(rolNaam);
+    var rol = await RolMaak(rolNaam);
 
     Gebruiker user = new()
     {

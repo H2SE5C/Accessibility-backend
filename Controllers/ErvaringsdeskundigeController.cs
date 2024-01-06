@@ -30,9 +30,9 @@ namespace Accessibility_app.Controllers
         [HttpGet]
         public async Task<IActionResult> GetErvaringsdeskundigen()
         {
-            var ervaringsdeskundigen = _context.Ervaringsdeskundigen
+            var ervaringsdeskundigen = await _context.Ervaringsdeskundigen
               .Include(e => e.Aandoeningen)
-              .ToList();
+              .ToListAsync();
 
             var ervaringsdeskundigenDto = ervaringsdeskundigen
                 .Select(e => new ErvaringsdeskundigeDto
