@@ -1,5 +1,6 @@
 ﻿using Accessibility_app.Data;
 using Accessibility_app.Models;
+using Accessibility_backend;
 using Accessibility_backend.Modellen.Extra;
 using Accessibility_backend.Modellen.Registreermodellen;
 using Microsoft.AspNetCore.Identity;
@@ -22,17 +23,33 @@ public class AuthenticatieController : ControllerBase
     private readonly RoleManager<Rol> _roleManager;
     private readonly IConfiguration _configuration;
     private readonly ApplicationDbContext _context;
+    private readonly IEmailSender _emailSender;
 
 
     public AuthenticatieController(
         UserManager<Gebruiker> userManager,
         RoleManager<Rol> roleManager,
-        IConfiguration configuration, ApplicationDbContext applicationDbContext)
+        IConfiguration configuration, 
+        ApplicationDbContext applicationDbContext,
+        IEmailSender emailSender)
     {
         _context = applicationDbContext;
         _userManager = userManager;
         _roleManager = roleManager;
         _configuration = configuration;
+        _emailSender = emailSender;
+    }
+
+    //dit kan ergens anders zodat bedrijf het ook kan gebruiken misschien? idk
+    [HttpGet("/verifieer")]
+    public async Task<IActionResult> VerifieerEmail(string token, string email)
+    {
+        var gebruiker = await _userManager.FindByEmailAsync(email);
+        if (gebruiker == null)
+            return BadRequest();
+
+        await _userManager.ConfirmEmailAsync(gebruiker, token);
+        return Ok("Geverifieerd! U kan dit venster sluiten.");
     }
 
     [HttpPost]
@@ -84,31 +101,207 @@ public class AuthenticatieController : ControllerBase
     [HttpPost]
 
     [HttpPost("registreer-beheerder")]
-    public async Task<IActionResult> RegistreerBeheerder([FromBody] RegisterDeveloper model)
+    public async Task<IActionResult> RegistreerBeheerder([FromBody] RegistrerenBasis model)
     {
-        var roleName = "Beheerder";
-        await RegisterUserWithRole(model, roleName);
+        var rolNaam = "Beheerder";
+        await RegistreerGebruikerMetRol(model, rolNaam);
         return Ok(new Response { Status = "Success", Message = "User created successfully!" });
     }
 
     [HttpPost("registreer-developer")]
-    public async Task<IActionResult> RegistreerDeveloper([FromBody] RegisterDeveloper model)
+    public async Task<IActionResult> RegistreerDeveloper([FromBody] RegistrerenBasis model)
     {
-        var roleName = "Developer";
-        await RegisterUserWithRole(model, roleName);
+        var rolNaam = "Developer";
+        await RegistreerGebruikerMetRol(model, rolNaam);
         return Ok(new Response { Status = "Success", Message = "User created successfully!" });
     }
 
-    private async Task RegisterUserWithRole(RegisterDeveloper model, string roleName)
+
+    [HttpPost("registreer-Medewerker")]
+    public async Task<IActionResult> RegistreerMedewerker([FromBody] RegistrerenMedewerkers model)
     {
+        var rolNaam = "Medewerker";
         var userExists = await _userManager.FindByNameAsync(model.Email);
         if (userExists != null)
         {
             throw new Exception("User already exists!");
         }
 
-        var roleExists = await _roleManager.RoleExistsAsync(roleName);
-        var role = new Rol { Naam = roleName, Name = roleName };
+        var rol = await rolMaak(rolNaam);
+
+        Medewerker medewerker = new()
+        {
+            UserName = model.Email,
+            Naam = model.Naam,
+            Email = model.Email,
+            Rol = rol,
+            EmailConfirmed = true
+        };
+
+        var result = await _userManager.CreateAsync(medewerker, model.Wachtwoord);
+        if (!result.Succeeded)
+        {
+            var exceptionText = result.Errors.Aggregate("User Creation Failed - Identity Exception. Errors were: \n\r\n\r", (current, error) => current + (" - " + error + "\n\r"));
+            throw new Exception(exceptionText);
+        }
+
+        await _userManager.AddToRoleAsync(medewerker, rolNaam);
+        return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+    }
+
+
+    // POST api/Authenticatie/registreer-Bedrijf
+    //voorbeeld:
+    /*{
+        "Bedrijfsnaam": "AH",
+        "Omschrijving": "Awesome",
+        "wachtwoord": "String123@",
+        "email": "Killer@example.com",
+        "Locatie": "Amsterdam 21",
+        "Link": "https://www.ah.nl/?gad_source=1&gclid=CjwKCAiA7t6sBhAiEiwAsaieYoHEM-7ASRzYNpFhpGe3o3Q7bwtwR4_96ouq7Q_cLXJEli9IenU3EhoCB_MQAvD_BwE"
+
+        }*/
+    [HttpPost("registreer-Bederijf")]
+    public async Task<IActionResult> RegistreerBedrijf([FromBody] RegistrerenBedrijf model)
+    {
+        var rolNaam = "Bedrijf";
+        var userExists = await _userManager.FindByNameAsync(model.Email);
+        if (userExists != null)
+        {
+            throw new Exception("User already exists!");
+        }
+
+        var rol = await rolMaak(rolNaam);
+
+        Bedrijf bedrijf = new()
+        {
+            UserName = model.Email,
+            Bedrijfsnaam = model.Bedrijfsnaam,
+            Omschrijving = model.Omschrijving,
+            Locatie = model.Locatie,
+            LinkNaarBedrijf = model.LinkNaarBedrijf,
+            Email = model.Email,
+            Rol = rol,
+            EmailConfirmed = true
+        };
+
+        var result = await _userManager.CreateAsync(bedrijf, model.Wachtwoord);
+        if (!result.Succeeded)
+        {
+            var exceptionText = result.Errors.Aggregate("User Creation Failed - Identity Exception. Errors were: \n\r\n\r", (current, error) => current + (" - " + error + "\n\r"));
+            throw new Exception(exceptionText);
+        }
+
+        await _userManager.AddToRoleAsync(bedrijf, rolNaam);
+        return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+    }
+
+    // post /api/Authenticatie/registreer-ervaringsdeskundige
+    //voorbeeld:
+    /*{
+        "voornaam": "Dude",
+        "achternaam": "Awesome",
+        "wachtwoord": "String123@",
+        "email": "Killer@example.com",
+        "postcode": "2224GE",
+        "minderjarig": false,
+        "telefoonnummer": "0684406262",
+        "aandoeningen" : [
+        {
+              "id": 2,
+              "naam": "Slechtziendheid"
+        },
+        {
+              "id": 4,
+             "naam": "ADHD"
+        }
+        ],
+        "typeOnderzoeken": [
+        {
+            "id": 1,
+            "naam": "Vragenlijst"
+        }
+        ],
+        "voorkeurBenadering": "geen voorkeur",
+        "commerciële": false
+        }*/
+    [HttpPost("registreer-ervaringsdeskundige")]
+    public async Task<IActionResult> RegistreerErvaringsdeskundige([FromBody] RegistrerenErvaringdeskundige model)
+    {
+
+        var userExists = await _userManager.FindByEmailAsync(model.Email);
+        var rol = await rolMaak("Ervaringsdeskundige");
+        var Hulpmiddelen = _context.Hulpmiddelen.Where(a => model.Hulpmiddelen.Select(aa => aa.Id).Contains(a.Id)).ToList();
+        var Aandoeningen = _context.Aandoeningen.Where(a => model.Aandoeningen.Select(aa => aa.Id).Contains(a.Id)).ToList();
+        var TypeOnderzoeken = _context.TypeOnderzoeken.Where(t => model.TypeOnderzoeken.Select(to => to.Id).Contains(t.Id)).ToList();
+
+        Voogd Voogd = null;
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (userExists != null)
+            return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
+
+        if (model.Minderjarig)
+        {
+            Voogd = await _context.Voogden.Where(v => v.Email == model.VoogdEmail).FirstOrDefaultAsync();
+            if (Voogd == null)
+            {
+                Voogd = new()
+                {
+                    Voornaam = model.VoogdVoornaam,
+                    Achternaam = model.VoogdAchternaam,
+                    Email = model.VoogdEmail,
+                    Telefoonnummer = model.VoogdTelefoonnummer
+                };
+
+                await _context.Voogden.AddAsync(Voogd);
+                await _context.SaveChangesAsync();
+            }
+        }
+        Ervaringsdeskundige ervaringsdeskundige = new()
+        {
+            Voornaam = model.Voornaam,
+            Achternaam = model.Achternaam,
+            Postcode = model.Postcode,
+            Minderjarig = model.Minderjarig,
+            PhoneNumber = model.Telefoonnummer,
+            Hulpmiddelen = Hulpmiddelen,
+            Aandoeningen = Aandoeningen,
+            VoorkeurBenadering = model.VoorkeurBenadering,
+            TypeOnderzoeken = TypeOnderzoeken,
+            UserName = model.Email,
+            Commercerciële = model.Commercerciële,
+            Email = model.Email,
+            Rol = rol,
+            Voogd = Voogd
+        };
+
+        var result = await _userManager.CreateAsync(ervaringsdeskundige, model.Wachtwoord);
+        if (!result.Succeeded)
+        {
+            var exceptionText = result.Errors.Aggregate("User Creation Failed - Identity Exception. Errors were: \n\r\n\r", (current, error) => current + (" - " + error + "\n\r"));
+            throw new Exception(exceptionText);
+            /*return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });*/
+        }
+
+        //email verzend stuk kan ook misschien een methode worden?
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(ervaringsdeskundige);
+        var link = Url.Action(nameof(VerifieerEmail), "Authenticatie", new { token, email = ervaringsdeskundige.Email }, Request.Scheme);
+        await _emailSender.SendEmailAsync(ervaringsdeskundige.Email, "verifieer email accessibility", link);
+        await _userManager.AddToRoleAsync(ervaringsdeskundige, "Ervaringsdeskundige");
+        /*	await _userManager.AddToRoleAsync(ervaringsdeskundige, "Ervaringsdeskundige");*/
+        return Ok(new Response { Status = "Success", Message = "Er is een verificatie email verstuurd naar: " + ervaringsdeskundige.Email + "!" });
+    }
+
+   
+    private async Task<Rol> rolMaak(string rolNaam) 
+    {
+        var roleExists = await _roleManager.RoleExistsAsync(rolNaam);
+        var role = new Rol { Naam = rolNaam, Name = rolNaam };
         if (!roleExists)
         {
             var res = await _roleManager.CreateAsync(role);
@@ -117,24 +310,36 @@ public class AuthenticatieController : ControllerBase
                 throw new Exception("Role creation failed!");
             }
         }
+         var rol = await _context.Rollen.FirstOrDefaultAsync(r => r.Naam == rolNaam);
+        return rol;
+    }
 
-        var rol = await _context.Rollen.FirstOrDefaultAsync(r => r.Naam == roleName);
-        Gebruiker user = new()
-        {
-            UserName = model.Email,
-            Email = model.Email,
-            Rol = rol,
-            EmailConfirmed = true
-        };
+    private async Task RegistreerGebruikerMetRol(RegistrerenBasis model, string rolNaam)
+    {
+    var userExists = await _userManager.FindByNameAsync(model.Email);
+    if (userExists != null)
+    {
+        throw new Exception("User already exists!");
+    }
 
-        var result = await _userManager.CreateAsync(user, model.Wachtwoord);
-        if (!result.Succeeded)
-        {
-            var exceptionText = result.Errors.Aggregate("User Creation Failed - Identity Exception. Errors were: \n\r\n\r", (current, error) => current + (" - " + error + "\n\r"));
-            throw new Exception(exceptionText);
-        }
+    var rol = await rolMaak(rolNaam);
 
-        await _userManager.AddToRoleAsync(user, roleName);
+    Gebruiker user = new()
+    {
+        UserName = model.Email,
+        Email = model.Email,
+        Rol = rol,
+        EmailConfirmed = true
+    };
+
+    var result = await _userManager.CreateAsync(user, model.Wachtwoord);
+    if (!result.Succeeded)
+    {
+        var exceptionText = result.Errors.Aggregate("User Creation Failed - Identity Exception. Errors were: \n\r\n\r", (current, error) => current + (" - " + error + "\n\r"));
+        throw new Exception(exceptionText);
+    }
+
+    await _userManager.AddToRoleAsync(user, rolNaam);
     }
 
 

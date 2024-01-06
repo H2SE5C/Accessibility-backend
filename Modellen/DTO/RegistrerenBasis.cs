@@ -2,7 +2,7 @@
 
 namespace Accessibility_backend.Modellen.Registreermodellen
 {
-    public class RegisterDeveloper
+    public class RegistrerenBasis
     {
 
         [EmailAddress]

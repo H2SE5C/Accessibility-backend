@@ -5,7 +5,7 @@ namespace Accessibility_backend.Modellen.Registreermodellen
 {
     //model voor het registreren van ervaringsdeskundige
     //misschien list van hulpmiddel, aandoening etc vervangen met list<int>?
-    public class RegisterModel
+    public class RegistrerenErvaringdeskundige
     {
         [Required(ErrorMessage = "Voornaam is required")]
         public string Voornaam { get; set; }
