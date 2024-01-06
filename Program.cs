@@ -8,10 +8,22 @@ using Accessibility_app.Models;
 using Accessibility_backend.Modellen.Extra;
 using Accessibility_backend;
 
+var CorsPolicyName = "AllowOrigins";
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
 var ConnectionString = configuration.GetConnectionString("DefaultConnection");
-// Add services to the container.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: CorsPolicyName,
+					  policy =>
+					  {
+						  policy.WithOrigins(
+                              "http://localhost:3000",
+                              "https://accessibility-frontend.azurewebsites.net")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+					  });
+});
 
 // For Entity Framework
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(ConnectionString));
@@ -68,7 +80,8 @@ if (app.Environment.IsDevelopment())
 }*/
 
 app.UseHttpsRedirection();
-
+app.UseRouting();
+app.UseCors(CorsPolicyName);
 app.UseAuthentication();
 app.UseAuthorization();
 

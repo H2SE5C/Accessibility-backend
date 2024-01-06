@@ -87,7 +87,7 @@ namespace Accessibility_app.Controllers
                 Id = a.Id,
                 Naam = a.Naam
             }).ToList(),
-            Commercerciële = e.Commercerciële,
+            /*Commerciële = e.Commerciële,*/
             Voogd = e.Voogd
         })
         .FirstAsync();
@@ -177,7 +177,7 @@ namespace Accessibility_app.Controllers
                 VoorkeurBenadering = model.VoorkeurBenadering,
                 TypeOnderzoeken = TypeOnderzoeken,
                 UserName = model.Email,
-                Commercerciële = model.Commercerciële,
+				Commerciële = model.Commerciële,
                 Email = model.Email,
                 Rol = rol,
                 Voogd = Voogd

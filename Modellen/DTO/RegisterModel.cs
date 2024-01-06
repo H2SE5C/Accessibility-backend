@@ -32,7 +32,7 @@ namespace Accessibility_backend.Modellen.Registreermodellen
         public List<Aandoening> Aandoeningen { get; set; }
         public string VoorkeurBenadering { get; set; } = null!;
         public List<TypeOnderzoek> TypeOnderzoeken { get; set; } = new();
-        public bool Commercerciële { get; set; }
+        public bool Commerciële { get; set; }
 
         public string? VoogdVoornaam { get; set; }
         public string? VoogdAchternaam { get; set; }
