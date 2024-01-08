@@ -91,7 +91,7 @@ public class AuthenticatieController : ControllerBase
         {
             token = new JwtSecurityTokenHandler().WriteToken(token),
             expiration = token.ValidTo,
-            userRol = userRoles,
+            roles = userRoles,
         });
         /* }
          return Unauthorized();*/
