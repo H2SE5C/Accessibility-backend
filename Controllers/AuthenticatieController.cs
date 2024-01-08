@@ -182,6 +182,7 @@ public class AuthenticatieController : ControllerBase
             LinkNaarBedrijf = model.LinkNaarBedrijf,
             Email = model.Email,
             Rol = rol,
+            EmailConfirmed = true
             /*EmailConfirmed = true*/
         };
 
@@ -294,7 +295,7 @@ public class AuthenticatieController : ControllerBase
         await _emailSender.SendEmailAsync(ervaringsdeskundige.Email, "Verifieer email - Accessibility", link);
         await _userManager.AddToRoleAsync(ervaringsdeskundige, "Ervaringsdeskundige");
         /*	await _userManager.AddToRoleAsync(ervaringsdeskundige, "Ervaringsdeskundige");*/
-        return Ok(new Response { Status = "Success", Message = "Er is een verificatie email verstuurd naar: " + ervaringsdeskundige.Email + "!" });
+        return Ok(new Response { Status = "Success", Message = "Er is een verificatie email verstuurd naar: " + ervaringsdeskundige.Email + "! LINK:"+link });
     }
 
    
