@@ -18,7 +18,7 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 	public DbSet<Beperking> Beperkingen { get; set; }
 	public DbSet<Bericht> Berichten { get; set; }
 	public DbSet<Beschikbaarheid> Beschikbaarheden { get; set; }
-	public DbSet<Chat> Chats { get; set; }
+	public DbSet<Chat> Chats { get; set; }  
 	public DbSet<Ervaringsdeskundige> Ervaringsdeskundigen { get; set; }
 	public DbSet<Hulpmiddel> Hulpmiddelen { get; set; }
 	public DbSet<Log> Logs { get; set; }

@@ -53,17 +53,7 @@ namespace Accessibility_app.Controllers
         [HttpPost]
         public async void Post([FromBody] OnderzoekForm model)
         {
-            var bedrijfId = model.BedrijfId;
-            var bedrijf = await _context.Bedrijven.Where(b => b.Id == bedrijfId).FirstOrDefaultAsync();
-            Onderzoek onderzoek = new Onderzoek() {
-                Titel = model.Titel,
-                Omschrijving = model.Omschrijving,
-                Beloning = model.Beloning,
-                Status = model.Status,
-                Bedrijf = bedrijf,
-
-            }
-
+           
         }
 
         // PUT api/<OnderzoekController>/5
