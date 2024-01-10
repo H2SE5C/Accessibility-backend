@@ -158,7 +158,7 @@ public class AuthenticatieController : ControllerBase
         "wachtwoord": "String123@",
         "email": "Killer@example.com",
         "Locatie": "Amsterdam 21",
-        "Link": "https://www.ah.nl/?gad_source=1&gclid=CjwKCAiA7t6sBhAiEiwAsaieYoHEM-7ASRzYNpFhpGe3o3Q7bwtwR4_96ouq7Q_cLXJEli9IenU3EhoCB_MQAvD_BwE"
+        "LinkNaarBedrijf": "https://www.ah.nl/?gad_source=1&gclid=CjwKCAiA7t6sBhAiEiwAsaieYoHEM-7ASRzYNpFhpGe3o3Q7bwtwR4_96ouq7Q_cLXJEli9IenU3EhoCB_MQAvD_BwE"
 
         }*/
     [HttpPost("registreer-bedrijf")]

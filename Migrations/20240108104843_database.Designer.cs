@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Accessibility_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240106233509_MaakDatabase")]
-    partial class MaakDatabase
+    [Migration("20240108104843_database")]
+    partial class database
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

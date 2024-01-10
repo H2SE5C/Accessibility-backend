@@ -16,9 +16,10 @@ namespace Accessibility_app.Controllers
         }
 		// GET: api/<BedrijfController>
 		[HttpGet]
-		public IActionResult GetBedrijven()
+		public async Task<IActionResult> GetBedrijven()
 		{
-			return Ok(_context.Bedrijven.ToList());
+            var bedrijven = await _context.Bedrijven.ToListAsync();
+			return Ok(bedrijven);
 		}
 
 		// GET api/<BedrijfController>/5
