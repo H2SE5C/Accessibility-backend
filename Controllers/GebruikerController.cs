@@ -1,5 +1,6 @@
 ﻿using Accessibility_app.Data;
 using Accessibility_app.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,10 +18,12 @@ namespace Accessibility_app.Controllers
             _context = applicationDbContext;
         }
         // GET: api/<GebruikerController>
+
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetGebruikers()
         {
-            //misschien nog check als gebruikers lijst null is?
+			//misschien nog check als gebruikers lijst null is?
 			return Ok(await _context.Gebruikers.ToListAsync());
         }
 
