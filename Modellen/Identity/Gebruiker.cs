@@ -12,7 +12,6 @@ namespace Accessibility_app.Models
 		public Rol Rol { get; set; }
 
 		public string? RefreshToken { get; set; }
-		public DateTime? TokenVervaldatum { get; set; }
 		/*public override string UserName
 		{
 			get => Email;

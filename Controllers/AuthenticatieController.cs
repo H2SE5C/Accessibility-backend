@@ -92,7 +92,6 @@ public class AuthenticatieController : ControllerBase
 		var refreshToken = Guid.NewGuid().ToString();
 		var refreshExpiry = DateTime.Now.AddDays(7);
 		user.RefreshToken = refreshToken;
-		user.TokenVervaldatum = refreshExpiry;
 
 		_context.Gebruikers.Update(user);
 		await _context.SaveChangesAsync();
