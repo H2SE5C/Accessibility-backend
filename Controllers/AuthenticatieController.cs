@@ -183,7 +183,7 @@ public class AuthenticatieController : ControllerBase
             Email = model.Email,
             Rol = rol,
             EmailConfirmed = true
-            /*EmailConfirmed = true*/
+            /*moet later false*/
         };
 
         var result = await _userManager.CreateAsync(bedrijf, model.Wachtwoord);

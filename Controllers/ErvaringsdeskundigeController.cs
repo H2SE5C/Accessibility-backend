@@ -19,7 +19,7 @@ namespace Accessibility_app.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Gebruiker> _userManager;
-        
+
         public ErvaringsdeskundigeController(UserManager<Gebruiker> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
@@ -48,7 +48,7 @@ namespace Accessibility_app.Controllers
 
             return Ok(ervaringsdeskundigenDto);
         }
-       
+
 
         // GET api/<ErvaringsdeskundigeController>/5
         //dit is uhhh de oplossing voor de many to many??
@@ -87,6 +87,23 @@ namespace Accessibility_app.Controllers
             }
 
             return NotFound();
+        }
+
+
+        [HttpGet("Aandoeningen")]
+        public async Task<IActionResult> GetAandoeningen()
+        {
+            var aandoeningen = await _context.Aandoeningen.ToListAsync();
+
+            return Ok(aandoeningen);
+        }
+
+        [HttpGet("TypeOnderzoeken")]
+        public async Task<IActionResult> GetTypeOnderzoeken()
+        {
+            var aandoeningen = await _context.TypeOnderzoeken.ToListAsync();
+
+            return Ok(aandoeningen);
         }
 
 

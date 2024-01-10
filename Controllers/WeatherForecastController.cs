@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Accessibility_app.Controllers;
-[Authorize(Roles = "Developer")]
+[Authorize(Roles = "Bedrijf")]
 [ApiController]
 [Route("api/[controller]")]
 public class WeatherForecastController : ControllerBase

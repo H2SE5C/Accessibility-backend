@@ -1,4 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Accessibility_app.Data;
+using Accessibility_app.Models;
+using Accessibility_backend.Modellen.Registreermodellen;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using NuGet.Versioning;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,11 +15,31 @@ namespace Accessibility_app.Controllers
     [ApiController]
     public class OnderzoekController : ControllerBase
     {
+        private readonly ApplicationDbContext _context;
         // GET: api/<OnderzoekController>
         [HttpGet]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
+        }
+
+        [Authorize(Roles = "Bedrijf")]
+        // GET: api/<OnderzoekController>/Bedrijf
+        [HttpGet("Bedrijf/{id}")]
+        public async Task<IActionResult> GetOnderzoekBedrijf(int id)
+        {
+            List<Onderzoek> onderzoeks = null;
+            var bedrijf = await _context.Bedrijven
+              .Include(b => b.BedrijfsOnderzoekslijst)
+              .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (bedrijf != null)
+            {
+                onderzoeks = bedrijf.BedrijfsOnderzoekslijst.ToList();
+            }
+            else{ throw new Exception("Bedrijf niet gevonden"); }
+
+            return Ok(onderzoeks);
         }
 
         // GET api/<OnderzoekController>/5
@@ -24,14 +51,16 @@ namespace Accessibility_app.Controllers
 
         // POST api/<OnderzoekController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async void Post([FromBody] OnderzoekForm model)
         {
+           
         }
 
         // PUT api/<OnderzoekController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public void Put(int id, [FromBody] OnderzoekForm onderzoeker)
         {
+
         }
 
         // DELETE api/<OnderzoekController>/5
