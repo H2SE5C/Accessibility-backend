@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using NuGet.Versioning;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -50,9 +51,18 @@ namespace Accessibility_app.Controllers
 
         // POST api/<OnderzoekController>
         [HttpPost]
-        public void Post([FromBody] OnderzoekForm onderzoeker)
+        public async void Post([FromBody] OnderzoekForm model)
         {
-            
+            var bedrijfId = model.BedrijfId;
+            var bedrijf = await _context.Bedrijven.Where(b => b.Id == bedrijfId).FirstOrDefaultAsync();
+            Onderzoek onderzoek = new Onderzoek() {
+                Titel = model.Titel,
+                Omschrijving = model.Omschrijving,
+                Beloning = model.Beloning,
+                Status = model.Status,
+                Bedrijf = bedrijf,
+
+            }
 
         }
 

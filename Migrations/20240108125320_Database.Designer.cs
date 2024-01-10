@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Accessibility_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240106233509_MaakDatabase")]
-    partial class MaakDatabase
+    [Migration("20240108125320_Database")]
+    partial class Database
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -448,7 +448,7 @@ namespace Accessibility_backend.Migrations
                     b.Property<int>("TypeOnderzoekId")
                         .HasColumnType("int");
 
-                    b.Property<int>("VragenlijstId")
+                    b.Property<int?>("VragenlijstId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -952,9 +952,7 @@ namespace Accessibility_backend.Migrations
 
                     b.HasOne("Accessibility_app.Models.Vragenlijst", "Vragenlijst")
                         .WithMany()
-                        .HasForeignKey("VragenlijstId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("VragenlijstId");
 
                     b.Navigation("Bedrijf");
 

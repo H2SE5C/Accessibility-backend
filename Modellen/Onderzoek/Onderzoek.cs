@@ -9,7 +9,7 @@ namespace Accessibility_app.Models
 		public int Id { get; set; }
 		public string Titel { get; set; }
         public string Omschrijving { get; set; }
-        public Vragenlijst Vragenlijst { get; set; }
+        public Vragenlijst? Vragenlijst { get; set; }
         public string Beloning { get; set; }
         public string Status { get; set; }
         public Bedrijf Bedrijf { get; set; }

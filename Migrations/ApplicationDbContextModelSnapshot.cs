@@ -446,7 +446,7 @@ namespace Accessibility_backend.Migrations
                     b.Property<int>("TypeOnderzoekId")
                         .HasColumnType("int");
 
-                    b.Property<int>("VragenlijstId")
+                    b.Property<int?>("VragenlijstId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -950,9 +950,7 @@ namespace Accessibility_backend.Migrations
 
                     b.HasOne("Accessibility_app.Models.Vragenlijst", "Vragenlijst")
                         .WithMany()
-                        .HasForeignKey("VragenlijstId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("VragenlijstId");
 
                     b.Navigation("Bedrijf");
 

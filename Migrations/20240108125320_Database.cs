@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Accessibility_backend.Migrations
 {
-    public partial class MaakDatabase : Migration
+    public partial class Database : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -388,7 +388,7 @@ namespace Accessibility_backend.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Titel = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Omschrijving = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    VragenlijstId = table.Column<int>(type: "int", nullable: false),
+                    VragenlijstId = table.Column<int>(type: "int", nullable: true),
                     Beloning = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BedrijfId = table.Column<int>(type: "int", nullable: false),
@@ -414,8 +414,7 @@ namespace Accessibility_backend.Migrations
                         name: "FK_Onderzoek_Vragenlijst_VragenlijstId",
                         column: x => x.VragenlijstId,
                         principalTable: "Vragenlijst",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
