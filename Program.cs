@@ -17,11 +17,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: CorsPolicyName,
 					  policy =>
 					  {
-						  policy.WithOrigins(
+                          policy.WithOrigins(
                               "http://localhost:3000",
                               "https://accessibility-frontend.azurewebsites.net")
                           .AllowAnyHeader()
-                          .AllowAnyMethod();
+                          .AllowAnyMethod()
+                          .AllowCredentials();
 					  });
 });
 
@@ -41,6 +42,9 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddCookie(x =>
+{
+    x.Cookie.Name = "refresh";
 })
 
 // Adding Jwt Bearer
@@ -55,6 +59,14 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = configuration["JWT:ValidAudience"],
         ValidIssuer = configuration["JWT:ValidIssuer"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]))
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            context.Token = context.Request.Cookies["refresh"];
+            return Task.CompletedTask;
+        }
     };
 });
 
