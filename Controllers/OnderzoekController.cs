@@ -61,17 +61,17 @@ namespace Accessibility_app.Controllers
         [HttpGet("Bedrijf")]
         public async Task<IActionResult> GetOnderzoekBedrijf()
         {
-            var bedrijfId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var bedrijfId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var bedrijf = await _context.Bedrijven
               .Include(b => b.BedrijfsOnderzoekslijst)
-              .FirstOrDefaultAsync(b => b.Id == bedrijfId);
+              .FirstOrDefaultAsync(b => b.Id == int.Parse(bedrijfId));
 
             if (bedrijf != null)    
             {
                 var onderzoeks = await _context.Onderzoeken
                 .Include(o => o.Bedrijf )
                 .Include(o => o.TypeOnderzoek)
-                .Where(o => o.Bedrijf.Id == bedrijfId)
+                .Where(o => o.Bedrijf.Id == int.Parse(bedrijfId))
                 .Select(o => new OnderzoekDto
                 {
                     Id = o.Id,
