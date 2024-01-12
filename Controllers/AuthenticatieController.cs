@@ -374,7 +374,7 @@ public class AuthenticatieController : ControllerBase
 		await _emailSender.SendEmailAsync(ervaringsdeskundige.Email, "Verifieer email - Accessibility", link);
 		await _userManager.AddToRoleAsync(ervaringsdeskundige, "Ervaringsdeskundige");
 		/*	await _userManager.AddToRoleAsync(ervaringsdeskundige, "Ervaringsdeskundige");*/
-		return Ok(new Response { Status = "Success", Message = "Er is een verificatie email verstuurd naar: " + ervaringsdeskundige.Email /*+ "! LINK:" + link*/ });
+		return Ok(new Response { Status = "Success", Message = "Er is een verificatie email verstuurd naar: " + ervaringsdeskundige.Email + "! LINK:" + link });
 	}
 
 

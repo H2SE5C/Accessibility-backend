@@ -7,7 +7,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -124,6 +127,15 @@ namespace Accessibility_app.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+
+        // GET api/<ErvaringsdeskundigeController>
+        [Authorize]
+        [HttpGet("profiel")]
+        public async Task<IActionResult> GetErvaringsdeskundige() {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var ervaringsdeskundige = await _context.Ervaringsdeskundigen.FirstOrDefaultAsync(b => b.Id == int.Parse(userId));
+            return Ok(ervaringsdeskundige);
         }
     }
 }
