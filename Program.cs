@@ -19,10 +19,10 @@ builder.Services.AddCors(options =>
 					  {
                           policy.WithOrigins(
                               "http://localhost:3000",
-                              "https://accessibility-frontend.azurewebsites.net")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials();
+                              "https://accessibility-frontend.azurewebsites.net");
+						  policy.AllowCredentials();
+						  policy.AllowAnyHeader();
+                          policy.AllowAnyMethod();
 					  });
 });
 
