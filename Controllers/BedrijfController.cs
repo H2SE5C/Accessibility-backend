@@ -17,7 +17,7 @@ namespace Accessibility_app.Controllers
             _context = context;
         }
 		// GET: api/<BedrijfController>
-		[HttpGet]
+		[HttpGet("lijst")]
 		public async Task<IActionResult> GetBedrijven()
 		{
             var bedrijven = await _context.Bedrijven.ToListAsync();
@@ -60,6 +60,20 @@ namespace Accessibility_app.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+
+        // DELETE api/Bedrijf/
+        [Authorize]
+        [HttpDelete("delete-profiel")]
+        public async Task<IActionResult> DeleteBedrijf()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var bedrijf = await _context.Bedrijven.FirstOrDefaultAsync(b => b.Id == int.Parse(userId));
+
+            _context.Bedrijven.Remove(bedrijf);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }
