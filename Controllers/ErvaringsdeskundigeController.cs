@@ -101,14 +101,21 @@ namespace Accessibility_app.Controllers
         [HttpGet("TypeOnderzoeken")]
         public async Task<IActionResult> GetTypeOnderzoeken()
         {
-            var aandoeningen = await _context.TypeOnderzoeken.ToListAsync();
+            var typeOnderzoeken = await _context.TypeOnderzoeken.ToListAsync();
 
-            return Ok(aandoeningen);
+            return Ok(typeOnderzoeken);
         }
 
+		[HttpGet("Hulpmiddelen")]
+		public async Task<IActionResult> GetHulpmiddelen()
+		{
+			var hulpmiddelen = await _context.Hulpmiddelen.ToListAsync();
 
-        // PUT api/<ErvaringsdeskundigeController>/5
-        [HttpPut("{id}")]
+			return Ok(hulpmiddelen);
+		}
+
+		// PUT api/<ErvaringsdeskundigeController>/5
+		[HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
         }

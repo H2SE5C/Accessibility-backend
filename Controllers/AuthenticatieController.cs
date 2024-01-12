@@ -262,8 +262,7 @@ public class AuthenticatieController : ControllerBase
 			LinkNaarBedrijf = model.LinkNaarBedrijf,
 			Email = model.Email,
 			Rol = rol,
-			EmailConfirmed = true
-			/*moet later false*/
+			/*EmailConfirmed = true*/
 		};
 
 		var result = await _userManager.CreateAsync(bedrijf, model.Wachtwoord);
@@ -324,7 +323,7 @@ public class AuthenticatieController : ControllerBase
 		}
 
 		if (userExists != null)
-			return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
+			return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Email bestaat al!" });
 
 		if (model.Minderjarig)
 		{
@@ -375,7 +374,7 @@ public class AuthenticatieController : ControllerBase
 		await _emailSender.SendEmailAsync(ervaringsdeskundige.Email, "Verifieer email - Accessibility", link);
 		await _userManager.AddToRoleAsync(ervaringsdeskundige, "Ervaringsdeskundige");
 		/*	await _userManager.AddToRoleAsync(ervaringsdeskundige, "Ervaringsdeskundige");*/
-		return Ok(new Response { Status = "Success", Message = "Er is een verificatie email verstuurd naar: " + ervaringsdeskundige.Email + "! LINK:" + link });
+		return Ok(new Response { Status = "Success", Message = "Er is een verificatie email verstuurd naar: " + ervaringsdeskundige.Email /*+ "! LINK:" + link*/ });
 	}
 
 
