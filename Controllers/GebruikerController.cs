@@ -3,6 +3,7 @@ using Accessibility_app.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 //controller wordt gebruikt om admins te maken. developer is ook een soort gebruiker maar dat maken we wel direct in DB
@@ -20,9 +21,12 @@ namespace Accessibility_app.Controllers
         // GET: api/<GebruikerController>
 
         [Authorize]
+
+        [Authorize(Roles = "Ervaringsdeskundige")]
         [HttpGet]
         public async Task<IActionResult> GetGebruikers()
         {
+            var id = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 			//misschien nog check als gebruikers lijst null is?
 			return Ok(await _context.Gebruikers.ToListAsync());
         }

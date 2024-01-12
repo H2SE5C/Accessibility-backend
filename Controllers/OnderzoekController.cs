@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using NuGet.Versioning;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -55,22 +56,22 @@ namespace Accessibility_app.Controllers
             return Ok(onderzoeken);
         }
 
-        /*[Authorize(Roles = "Bedrijf")]*/
+        [Authorize(Roles = "Bedrijf")]
         // GET: api/<OnderzoekController>/Bedrijf
-        [HttpGet("Bedrijf/{id}")]
-        public async Task<IActionResult> GetOnderzoekBedrijf(int id)
+        [HttpGet("Bedrijf")]
+        public async Task<IActionResult> GetOnderzoekBedrijf()
         {
-            
+            var bedrijfId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var bedrijf = await _context.Bedrijven
               .Include(b => b.BedrijfsOnderzoekslijst)
-              .FirstOrDefaultAsync(b => b.Id == id);
+              .FirstOrDefaultAsync(b => b.Id == bedrijfId);
 
             if (bedrijf != null)    
             {
                 var onderzoeks = await _context.Onderzoeken
                 .Include(o => o.Bedrijf )
                 .Include(o => o.TypeOnderzoek)
-                .Where(o => o.Bedrijf.Id == id)
+                .Where(o => o.Bedrijf.Id == bedrijfId)
                 .Select(o => new OnderzoekDto
                 {
                     Id = o.Id,
