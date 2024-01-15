@@ -470,7 +470,7 @@ public class AuthenticatieController : ControllerBase
 		return token;
 	}
 
-	/* [HttpGet]
+    /* [HttpGet]
      [AllowAnonymous]
      public async Task<IActionResult> ConfirmEmail(string userId, string token)
      {

@@ -4,8 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using Accessibility_backend.Modellen.DTO;
 
 namespace Accessibility_app.Controllers
 {
@@ -13,17 +12,20 @@ namespace Accessibility_app.Controllers
     [ApiController]
     public class BedrijfController : ControllerBase
     {
-		private readonly ApplicationDbContext _context;
-		public BedrijfController(ApplicationDbContext context) { 
+        private readonly ApplicationDbContext _context;
+
+        public BedrijfController(ApplicationDbContext context)
+        {
             _context = context;
         }
-		// GET: api/<BedrijfController>
-		[HttpGet("lijst")]
-		public async Task<IActionResult> GetBedrijven()
-		{
+
+        // GET: api/<BedrijfController>
+        [HttpGet("lijst")]
+        public async Task<IActionResult> GetBedrijven()
+        {
             var bedrijven = await _context.Bedrijven.ToListAsync();
-			return Ok(bedrijven);
-		}
+            return Ok(bedrijven);
+        }
 
         // GET api/<BedrijfController>/5
         [Authorize]
@@ -44,10 +46,9 @@ namespace Accessibility_app.Controllers
             return Ok(bedrijf);
         }
 
-        // PUT: api/<BedrijfController>/profiel
         [Authorize]
-        [HttpPut("profiel")]
-        public async Task<IActionResult> PutBedrijf([FromBody] Bedrijf bedrijfUpdates)
+        [HttpPut("update")]
+        public async Task<IActionResult> PutBedrijf([FromBody] BedrijfDto bedrijfUpdates)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var bedrijf = await _context.Bedrijven.FirstOrDefaultAsync(b => b.Id == int.Parse(userId));
@@ -65,8 +66,6 @@ namespace Accessibility_app.Controllers
             bedrijf.PhoneNumber = bedrijfUpdates.PhoneNumber;
             bedrijf.LinkNaarBedrijf = bedrijfUpdates.LinkNaarBedrijf;
 
-            // bedrijf.Password = bedrijfUpdates.Password;
-
             try
             {
                 await _context.SaveChangesAsync();
@@ -74,26 +73,15 @@ namespace Accessibility_app.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.Bedrijven.Any(b => b.Id == int.Parse(userId)))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest("Er is een fout opgetreden bij het bijwerken van het bedrijf.");
             }
         }
-
-
-
-
-
 
         // DELETE api/<BedrijfController>/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+            // Implementeer hier de logica om een bedrijf te verwijderen
         }
 
         // DELETE api/Bedrijf/
