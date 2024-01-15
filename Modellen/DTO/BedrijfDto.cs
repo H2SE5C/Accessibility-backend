@@ -1,7 +1,9 @@
 ﻿namespace Accessibility_backend.Modellen.DTO
 {
-    public class BedrijfDto
+
+	public class BedrijfDto 
     {
+        public int Id { get; set; }
         public string Bedrijfsnaam { get; set; }
         public string Omschrijving { get; set; }
         public string Email { get; set; }

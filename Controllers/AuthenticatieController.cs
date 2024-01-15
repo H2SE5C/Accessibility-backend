@@ -47,7 +47,7 @@ public class AuthenticatieController : ControllerBase
 	{
 		var gebruiker = await _userManager.FindByEmailAsync(email);
 		if (gebruiker == null)
-			return BadRequest();
+			return BadRequest(new Response { Status = "Error", Message = "Geen gebruiker gevonden" });
 
 		await _userManager.ConfirmEmailAsync(gebruiker, token);
 		return Ok("Geverifieerd! U kan dit venster sluiten.");
@@ -64,6 +64,12 @@ public class AuthenticatieController : ControllerBase
 		};
 		if (!user.EmailConfirmed)
 		{
+			var rolesForUser = await _userManager.GetRolesAsync(user);
+
+			if (rolesForUser[0] == "Bedrijf")
+			{
+				return Unauthorized(new Response { Status = "Error", Message = "Een medewerker moet eerst het account goedkeuren!" });
+			}
 			return Unauthorized(new Response { Status = "Error", Message = "Verifieer email eerst!" });
 		}
 		if (!await _userManager.CheckPasswordAsync(user, model.Wachtwoord))
@@ -132,10 +138,10 @@ public class AuthenticatieController : ControllerBase
 				SameSite = SameSiteMode.None
 			});
 
-			return Ok(new { message = "Logout successful" });
+			return Ok(new Response { Status = "Success", Message = "Uitgelogd!" });
 		}
 
-		return BadRequest("Geen token gevonden");
+		return BadRequest(new Response { Status = "Error", Message = "Geen token gevonden" });
 	}
 
 	[HttpGet]
@@ -171,10 +177,10 @@ public class AuthenticatieController : ControllerBase
 					roles = userRoles,
 				});
 			}
-			return BadRequest("Geen gebruiker gevonden");
+			return BadRequest(new Response { Status = "Error", Message = "Geen gebruiker gevonden!" });
 		}
 
-		return BadRequest("Geen token gevonden");
+		return BadRequest(new Response { Status = "Error", Message = "Geen token gevonden" });
 	}
 
 	//registratie vereist een goede wachtwoord: 1 hoofdletter, cijfer en rare teken
@@ -185,7 +191,7 @@ public class AuthenticatieController : ControllerBase
 	{
 		var rolNaam = "Beheerder";
 		await RegistreerGebruikerMetRol(model, rolNaam);
-		return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+		return Ok(new Response { Status = "Success", Message = "Gebruiker aangemaakt!" });
 	}
 
 	[HttpPost("registreer-developer")]
@@ -193,7 +199,7 @@ public class AuthenticatieController : ControllerBase
 	{
 		var rolNaam = "Developer";
 		await RegistreerGebruikerMetRol(model, rolNaam);
-		return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+		return Ok(new Response { Status = "Success", Message = "Gebruiker aangemaakt!" });
 	}
 
 
@@ -204,7 +210,7 @@ public class AuthenticatieController : ControllerBase
 		var userExists = await _userManager.FindByNameAsync(model.Email);
 		if (userExists != null)
 		{
-			throw new Exception("User already exists!");
+			return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Email bestaat al!" });
 		}
 
 		var rol = await RolMaak(rolNaam);
@@ -221,8 +227,7 @@ public class AuthenticatieController : ControllerBase
 		var result = await _userManager.CreateAsync(medewerker, model.Wachtwoord);
 		if (!result.Succeeded)
 		{
-			var exceptionText = result.Errors.Aggregate("User Creation Failed - Identity Exception. Errors were: \n\r\n\r", (current, error) => current + (" - " + error + "\n\r"));
-			throw new Exception(exceptionText);
+			return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Wachtwoord is verkeerd" });
 		}
 
 		await _userManager.AddToRoleAsync(medewerker, rolNaam);
@@ -245,10 +250,14 @@ public class AuthenticatieController : ControllerBase
 	public async Task<IActionResult> RegistreerBedrijf([FromBody] RegistrerenBedrijf model)
 	{
 		var rolNaam = "Bedrijf";
+		var nameExists = await _context.Bedrijven.Where(b => b.Bedrijfsnaam == model.Bedrijfsnaam).AnyAsync();
 		var userExists = await _userManager.FindByNameAsync(model.Email);
+		if (nameExists) {
+			return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Bedrijf naam wordt al gebruikt!" });
+		}
 		if (userExists != null)
 		{
-			throw new Exception("User already exists!");
+			return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Email bestaat al!" });
 		}
 
 		var rol = await RolMaak(rolNaam);
@@ -268,8 +277,7 @@ public class AuthenticatieController : ControllerBase
 		var result = await _userManager.CreateAsync(bedrijf, model.Wachtwoord);
 		if (!result.Succeeded)
 		{
-			var exceptionText = result.Errors.Aggregate("User Creation Failed - Identity Exception. Errors were: \n\r\n\r", (current, error) => current + (" - " + error + "\n\r"));
-			throw new Exception(exceptionText);
+			return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Wachtwoord is verkeerd" });
 		}
 
 		await _userManager.AddToRoleAsync(bedrijf, rolNaam);
@@ -363,9 +371,7 @@ public class AuthenticatieController : ControllerBase
 		var result = await _userManager.CreateAsync(ervaringsdeskundige, model.Wachtwoord);
 		if (!result.Succeeded)
 		{
-			var exceptionText = result.Errors.Aggregate("User Creation Failed - Identity Exception. Errors were: \n\r\n\r", (current, error) => current + (" - " + error + "\n\r"));
-			throw new Exception(exceptionText);
-			/*return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });*/
+			return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "Wachtwoord is verkeerd" });
 		}
 
 		//email verzend stuk kan ook misschien een methode worden?
@@ -400,7 +406,7 @@ public class AuthenticatieController : ControllerBase
 		var userExists = await _userManager.FindByNameAsync(model.Email);
 		if (userExists != null)
 		{
-			throw new Exception("User already exists!");
+			throw new Exception("Email bestaat al");
 		}
 
 		var rol = await RolMaak(rolNaam);
