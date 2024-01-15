@@ -70,9 +70,9 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 			);
 
 		builder.Entity<TypeOnderzoek>().HasData(
-			new { Id = 1, Naam = "Vragenlijst" },
-			new { Id = 2, Naam = "Fysiek" },
-			new { Id = 3, Naam = "Website test" }
+			new { Id = 1, Naam = "Vragenlijsten" },
+			new { Id = 2, Naam = "Onderzoek op locaties" },
+			new { Id = 3, Naam = "websites testen" }
 			);
 
 		builder.Entity<Hulpmiddel>().HasData(
@@ -80,6 +80,33 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 			new { Id = 2, Naam = "Brailleleesregels" },
 			new { Id = 3, Naam = "Contrast- en kleurinstellingen" },
 			new { Id = 4, Naam = "Aangepaste toetsenborden" }
+			);
+		builder.Entity<Rol>().HasData(
+			new { Id = 1, Naam = "Ervaringsdeskundige", Name = "Ervaringsdeskundige" },
+            new { Id = 2, Naam = "Bedrijf", Name = "Bedrijf" },
+            new { Id = 3, Naam = "Medewerker", Name = "Medewerker" },
+            new { Id = 4, Naam = "Beheerder", Name = "Beheerder" }
+            );
+		builder.Entity<Ervaringsdeskundige>().HasData(
+			new { 
+				Id = 1,
+				Rol = 1, 
+				Voornaam = "Johnny", 
+				Achternaam = "Bakker", 
+				Postcode = "5847DE",
+				Email = "ervaringsdeskundige@gmail.com",
+				PhoneNumber = "0694343273",
+
+				Minderjarig = false, 
+				Hulpmiddelen = new Hulpmiddel(), 
+				Aandoeningen = new List<int> {1,2}, 
+				Onderzoeken = new List<int> { },
+				VoorkeurBenadering = "Geen voorkeur", 
+				TypeOnderzoeken = new List<int> {1,2}, 
+				Commerciële = false, 
+				Beschikbaarheidsdata = new Beschikbaarheid(),
+				Voogd = new Voogd()
+				}
 			);
 	}
 }
