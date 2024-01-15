@@ -25,9 +25,12 @@ namespace Accessibility_backend.Modellen.Registreermodellen
         public DateTime? Datum { get; set; }
 
         [Required(ErrorMessage = "TypeOnderzoek is required")]
-        public TypeOnderzoek? TypeOnderzoek { get; set; }
+        public String? TypeOnderzoek { get; set; }
 
-      
+        [Required(ErrorMessage = "Beparking  is required")]
+        public List<Beperking> Beperkingen { get; set; }
+
+
 
     }
 }
