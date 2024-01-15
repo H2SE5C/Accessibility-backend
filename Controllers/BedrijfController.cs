@@ -1,8 +1,10 @@
 ﻿using Accessibility_app.Data;
+using Accessibility_app.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using System.Security.Claims;
+using Accessibility_backend.Modellen.DTO;
 
 namespace Accessibility_app.Controllers
 {
@@ -10,40 +12,90 @@ namespace Accessibility_app.Controllers
     [ApiController]
     public class BedrijfController : ControllerBase
     {
-		private readonly ApplicationDbContext _context;
-		public BedrijfController(ApplicationDbContext context) { 
+        private readonly ApplicationDbContext _context;
+
+        public BedrijfController(ApplicationDbContext context)
+        {
             _context = context;
         }
-		// GET: api/<BedrijfController>
-		[HttpGet]
-		public IActionResult GetBedrijven()
-		{
-			return Ok(_context.Bedrijven.ToList());
-		}
 
-		// GET api/<BedrijfController>/5
-		[HttpGet("{id}")]
-        public string Get(int id)
+        // GET: api/<BedrijfController>
+        [HttpGet("lijst")]
+        public async Task<IActionResult> GetBedrijven()
         {
-            return "value";
+            var bedrijven = await _context.Bedrijven.ToListAsync();
+            return Ok(bedrijven);
         }
 
-        // POST api/<BedrijfController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        // GET api/<BedrijfController>/5
+        [Authorize]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
         {
+            var bedrijf = await _context.Bedrijven.FirstOrDefaultAsync(b => b.Id == id);
+            return Ok(bedrijf);
         }
 
-        // PUT api/<BedrijfController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        // GET: api/<BedrijfController> (pakt eigen gegevens van bedrijf)
+        [Authorize]
+        [HttpGet("profiel")]
+        public async Task<IActionResult> GetBedrijf()
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var bedrijf = await _context.Bedrijven.FirstOrDefaultAsync(b => b.Id == int.Parse(userId));
+            return Ok(bedrijf);
+        }
+
+        [Authorize]
+        [HttpPut("update")]
+        public async Task<IActionResult> PutBedrijf([FromBody] BedrijfDto bedrijfUpdates)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var bedrijf = await _context.Bedrijven.FirstOrDefaultAsync(b => b.Id == int.Parse(userId));
+
+            if (bedrijf == null)
+            {
+                return NotFound();
+            }
+
+            // Werk alleen de velden bij die zijn gewijzigd
+            bedrijf.Bedrijfsnaam = bedrijfUpdates.Bedrijfsnaam;
+            bedrijf.Email = bedrijfUpdates.Email;
+            bedrijf.Locatie = bedrijfUpdates.Locatie;
+            bedrijf.Omschrijving = bedrijfUpdates.Omschrijving;
+            bedrijf.PhoneNumber = bedrijfUpdates.PhoneNumber;
+            bedrijf.LinkNaarBedrijf = bedrijfUpdates.LinkNaarBedrijf;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok(bedrijf); // Geef bijgewerkte gegevens terug als succesvol
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest("Er is een fout opgetreden bij het bijwerken van het bedrijf.");
+            }
         }
 
         // DELETE api/<BedrijfController>/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+            // Implementeer hier de logica om een bedrijf te verwijderen
+        }
+
+        // DELETE api/Bedrijf/
+        [Authorize]
+        [HttpDelete("delete-profiel")]
+        public async Task<IActionResult> DeleteBedrijf()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var bedrijf = await _context.Bedrijven.FirstOrDefaultAsync(b => b.Id == int.Parse(userId));
+
+            _context.Bedrijven.Remove(bedrijf);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }
