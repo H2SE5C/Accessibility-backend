@@ -1,4 +1,5 @@
 ﻿using Accessibility_app.Data;
+using Accessibility_app.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -43,18 +44,51 @@ namespace Accessibility_app.Controllers
             return Ok(bedrijf);
         }
 
-
-        // POST api/<BedrijfController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        // PUT: api/<BedrijfController>/profiel
+        [Authorize]
+        [HttpPut("profiel")]
+        public async Task<IActionResult> PutBedrijf([FromBody] Bedrijf bedrijfUpdates)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var bedrijf = await _context.Bedrijven.FirstOrDefaultAsync(b => b.Id == int.Parse(userId));
+
+            if (bedrijf == null)
+            {
+                return NotFound();
+            }
+
+            // Werk alleen de velden bij die zijn gewijzigd
+            bedrijf.Bedrijfsnaam = bedrijfUpdates.Bedrijfsnaam;
+            bedrijf.Email = bedrijfUpdates.Email;
+            bedrijf.Locatie = bedrijfUpdates.Locatie;
+            bedrijf.Omschrijving = bedrijfUpdates.Omschrijving;
+            bedrijf.PhoneNumber = bedrijfUpdates.PhoneNumber;
+            bedrijf.LinkNaarBedrijf = bedrijfUpdates.LinkNaarBedrijf;
+
+            // bedrijf.Password = bedrijfUpdates.Password;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok(bedrijf); // Geef bijgewerkte gegevens terug als succesvol
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Bedrijven.Any(b => b.Id == int.Parse(userId)))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
-        // PUT api/<BedrijfController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+
+
+
+
 
         // DELETE api/<BedrijfController>/5
         [HttpDelete("{id}")]
