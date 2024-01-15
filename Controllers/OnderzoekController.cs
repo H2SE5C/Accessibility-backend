@@ -133,14 +133,15 @@ namespace Accessibility_app.Controllers
          */
 
         // POST api/<OnderzoekController>
-        [HttpPost]
-        public async Task<IActionResult> Onderzoeken([FromBody] OnderzoekForm model)
+        [HttpPost("bedrijf/add")]
+        public async Task<IActionResult> AddOnderzoeken([FromBody] OnderzoekForm model)
         {
             try
             {
+                var bedrijfId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 var beperkingen = _context.Beperkingen.Where(a => model.Beperkingen.Select(aa => aa.Id).Contains(a.Id)).ToList();
                 var typeOnderzoek = await _context.TypeOnderzoeken.FirstOrDefaultAsync(t=>t.Naam == model.TypeOnderzoek);
-            var bedrijf = await _context.Bedrijven.FirstOrDefaultAsync(b=>b.Id == model.BedrijfId);
+                var bedrijf = await _context.Bedrijven.FirstOrDefaultAsync(b=>b.Id == int.Parse(bedrijfId));
          
                
                 Onderzoek onderzoek = new()
@@ -162,6 +163,14 @@ namespace Accessibility_app.Controllers
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
+        }
+
+        [HttpGet("Beperkingen")]
+        public async Task<IActionResult> GetBeperkingen()
+        {
+            var beperkingen = await _context.Beperkingen.ToListAsync();
+
+            return Ok(beperkingen);
         }
 
         // PUT api/<OnderzoekController>/5
