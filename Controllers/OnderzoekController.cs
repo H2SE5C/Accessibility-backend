@@ -174,13 +174,6 @@ namespace Accessibility_app.Controllers
         }
 
 
-        [HttpGet("Beperkingen")]
-        public async Task<IActionResult> GetBeperkingen()
-        {
-            var beperkingen = await _context.Beperkingen.ToListAsync();
-
-            return Ok(beperkingen);
-        }
 
         // PUT api/<OnderzoekController>/5
         [HttpPut("{id}")]
