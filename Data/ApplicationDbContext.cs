@@ -110,4 +110,3 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 			);
 	}
 }
-

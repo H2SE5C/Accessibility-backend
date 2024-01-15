@@ -243,7 +243,7 @@ public class AuthenticatieController : ControllerBase
         "wachtwoord": "String123@",
         "email": "Killer@example.com",
         "Locatie": "Amsterdam 21",
-        "Link": "https://www.ah.nl/?gad_source=1&gclid=CjwKCAiA7t6sBhAiEiwAsaieYoHEM-7ASRzYNpFhpGe3o3Q7bwtwR4_96ouq7Q_cLXJEli9IenU3EhoCB_MQAvD_BwE"
+        "LinkNaarBedrijf": "https://www.ah.nl/?gad_source=1&gclid=CjwKCAiA7t6sBhAiEiwAsaieYoHEM-7ASRzYNpFhpGe3o3Q7bwtwR4_96ouq7Q_cLXJEli9IenU3EhoCB_MQAvD_BwE"
 
         }*/
 	[HttpPost("registreer-bedrijf")]
@@ -267,6 +267,7 @@ public class AuthenticatieController : ControllerBase
 			UserName = model.Email,
 			Bedrijfsnaam = model.Bedrijfsnaam,
 			Omschrijving = model.Omschrijving,
+			PhoneNumber = model.PhoneNumber,
 			Locatie = model.Locatie,
 			LinkNaarBedrijf = model.LinkNaarBedrijf,
 			Email = model.Email,
@@ -476,7 +477,7 @@ public class AuthenticatieController : ControllerBase
 		return token;
 	}
 
-	/* [HttpGet]
+    /* [HttpGet]
      [AllowAnonymous]
      public async Task<IActionResult> ConfirmEmail(string userId, string token)
      {

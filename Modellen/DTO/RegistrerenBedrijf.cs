@@ -18,6 +18,9 @@ namespace Accessibility_backend.Modellen.Registreermodellen
         [Required(ErrorMessage = "Omschrijving is vereist")]
         public string? Omschrijving { get; set; }
 
+        [Required(ErrorMessage = "Telephone nummer is vereist")]
+        public string PhoneNumber { get; set; }
+
         [Required(ErrorMessage = "Locatie is vereist")]
         public string? Locatie { get; set; }
 
