@@ -15,12 +15,6 @@ namespace Accessibility_backend.Modellen.Registreermodellen
         [Required(ErrorMessage = "Beloning is required")]
         public string? Beloning { get; set; }
 
-        [Required(ErrorMessage = "Status is required")]
-        public string? Status { get; set; }
-
-        [Required(ErrorMessage = "Bedrijf is required")]
-        public int? BedrijfId { get; set; }
-
         [Required(ErrorMessage = "Datum is required")]
         public DateTime? Datum { get; set; }
 

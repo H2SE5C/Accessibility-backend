@@ -149,7 +149,7 @@ namespace Accessibility_app.Controllers
                 Titel = model.Titel,
                 Omschrijving = model.Omschrijving,
                 Beloning = model.Beloning,
-                Status = model.Status,
+                Status = "bezig",
                 Bedrijf =bedrijf,
                 Datum = (DateTime)model.Datum,
                 TypeOnderzoek = typeOnderzoek,
