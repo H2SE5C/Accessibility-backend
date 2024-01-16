@@ -133,14 +133,15 @@ namespace Accessibility_app.Controllers
          */
 
         // POST api/<OnderzoekController>
-        [HttpPost]
-        public async Task<IActionResult> Onderzoeken([FromBody] OnderzoekForm model)
+        [HttpPost("bedrijf/add")]
+        public async Task<IActionResult> AddOnderzoeken([FromBody] OnderzoekForm model)
         {
             try
             {
+                var bedrijfId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 var beperkingen = _context.Beperkingen.Where(a => model.Beperkingen.Select(aa => aa.Id).Contains(a.Id)).ToList();
                 var typeOnderzoek = await _context.TypeOnderzoeken.FirstOrDefaultAsync(t=>t.Naam == model.TypeOnderzoek);
-            var bedrijf = await _context.Bedrijven.FirstOrDefaultAsync(b=>b.Id == model.BedrijfId);
+                var bedrijf = await _context.Bedrijven.FirstOrDefaultAsync(b=>b.Id == int.Parse(bedrijfId));
          
                
                 Onderzoek onderzoek = new()
@@ -148,7 +149,7 @@ namespace Accessibility_app.Controllers
                 Titel = model.Titel,
                 Omschrijving = model.Omschrijving,
                 Beloning = model.Beloning,
-                Status = model.Status,
+                Status = "bezig",
                 Bedrijf =bedrijf,
                 Datum = (DateTime)model.Datum,
                 TypeOnderzoek = typeOnderzoek,
@@ -164,7 +165,6 @@ namespace Accessibility_app.Controllers
             }
         }
 
-
         [HttpGet("Beperkingen")]
         public async Task<IActionResult> GetBeperkingen()
         {
@@ -172,6 +172,8 @@ namespace Accessibility_app.Controllers
 
             return Ok(beperkingen);
         }
+
+
 
         // PUT api/<OnderzoekController>/5
         [HttpPut("{id}")]

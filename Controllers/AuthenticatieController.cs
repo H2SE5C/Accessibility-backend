@@ -267,6 +267,7 @@ public class AuthenticatieController : ControllerBase
 			UserName = model.Email,
 			Bedrijfsnaam = model.Bedrijfsnaam,
 			Omschrijving = model.Omschrijving,
+			PhoneNumber = model.PhoneNumber,
 			Locatie = model.Locatie,
 			LinkNaarBedrijf = model.LinkNaarBedrijf,
 			Email = model.Email,
