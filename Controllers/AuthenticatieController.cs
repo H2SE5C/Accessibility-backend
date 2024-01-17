@@ -1,19 +1,6 @@
-﻿using Accessibility_app.Data;
-using Accessibility_app.Models;
-using Accessibility_backend;
-using Accessibility_backend.Modellen.Extra;
-using Accessibility_backend.Modellen.Registreermodellen;
+﻿using Accessibility_backend.Modellen.Registreermodellen;
 using Accessibility_backend.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Data;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Response = Accessibility_backend.Modellen.Registreermodellen.Response;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
