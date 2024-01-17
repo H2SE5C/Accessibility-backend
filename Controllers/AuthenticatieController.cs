@@ -272,7 +272,7 @@ public class AuthenticatieController : ControllerBase
 			LinkNaarBedrijf = model.LinkNaarBedrijf,
 			Email = model.Email,
 			Rol = rol,
-			/*EmailConfirmed = true*/
+			EmailConfirmed = true,
 		};
 
 		var result = await _userManager.CreateAsync(bedrijf, model.Wachtwoord);

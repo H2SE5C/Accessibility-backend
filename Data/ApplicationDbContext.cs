@@ -9,16 +9,16 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Accessibility_app.Data;
 
-public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
+public class ApplicationDbContext : IdentityDbContext<Gebruiker, Rol, int>
 {
 	public DbSet<Aandoening> Aandoeningen { get; set; }
-    public DbSet<Rol> Rollen { get; set; }
-    public DbSet<Antwoord> Antwoorden { get; set; }
+	public DbSet<Rol> Rollen { get; set; }
+	public DbSet<Antwoord> Antwoorden { get; set; }
 	public DbSet<Bedrijf> Bedrijven { get; set; }
 	public DbSet<Beperking> Beperkingen { get; set; }
 	public DbSet<Bericht> Berichten { get; set; }
 	public DbSet<Beschikbaarheid> Beschikbaarheden { get; set; }
-	public DbSet<Chat> Chats { get; set; }  
+	public DbSet<Chat> Chats { get; set; }
 	public DbSet<Ervaringsdeskundige> Ervaringsdeskundigen { get; set; }
 	public DbSet<Hulpmiddel> Hulpmiddelen { get; set; }
 	public DbSet<Log> Logs { get; set; }
@@ -30,14 +30,14 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 	public DbSet<Vraag> Vragen { get; set; }
 	public DbSet<Vragenlijst> Vragenlijsten { get; set; }
 
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-    {
-    }
+	public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+	{
+	}
 
 	protected override void OnModelCreating(ModelBuilder builder)
 	{
 		base.OnModelCreating(builder);
-		
+
 		builder.Entity<Gebruiker>()
 	   .HasMany(u => u.Berichten)
 	   .WithOne(b => b.Verzender)
@@ -83,27 +83,28 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker,Rol,int>
 			);
 		/*builder.Entity<Rol>().HasData(
 			new { Id = 1, Naam = "Ervaringsdeskundige", Name = "Ervaringsdeskundige" },
-            new { Id = 2, Naam = "Bedrijf", Name = "Bedrijf" },
-            new { Id = 3, Naam = "Medewerker", Name = "Medewerker" },
-            new { Id = 4, Naam = "Beheerder", Name = "Beheerder" }
-            );
+			new { Id = 2, Naam = "Bedrijf", Name = "Bedrijf" },
+			new { Id = 3, Naam = "Medewerker", Name = "Medewerker" },
+			new { Id = 4, Naam = "Beheerder", Name = "Beheerder" }
+			);
 		builder.Entity<Ervaringsdeskundige>().HasData(
-			new { 
+			new
+			{
 				Id = 1,
-				Rol = 1, 
-				Voornaam = "Johnny", 
-				Achternaam = "Bakker", 
+				Rol = 1,
+				Voornaam = "Johnny",
+				Achternaam = "Bakker",
 				Postcode = "5847DE",
 				Email = "ervaringsdeskundige@gmail.com",
 				PhoneNumber = "0694343273",
 
-				Minderjarig = false, 
-				Hulpmiddelen = new Hulpmiddel(), 
-				Aandoeningen = new List<int> {1,2}, 
+				Minderjarig = false,
+				Hulpmiddelen = new Hulpmiddel(),
+				Aandoeningen = new List<int> { 1, 2 },
 				Onderzoeken = new List<int> { },
-				VoorkeurBenadering = "Geen voorkeur", 
-				TypeOnderzoeken = new List<int> {1,2}, 
-				Commerciële = false, 
+				VoorkeurBenadering = "Geen voorkeur",
+				TypeOnderzoeken = new List<int> { 1, 2 },
+				Commerciële = false,
 				Beschikbaarheidsdata = new Beschikbaarheid(),
 				Voogd = new Voogd()
 				}

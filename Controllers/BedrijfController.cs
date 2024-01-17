@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Accessibility_backend.Modellen.DTO;
+using Microsoft.AspNetCore.Identity;
 
 namespace Accessibility_app.Controllers
 {
@@ -13,6 +14,7 @@ namespace Accessibility_app.Controllers
     public class BedrijfController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Bedrijf> _userManager;
 
         public BedrijfController(ApplicationDbContext context)
         {
@@ -58,13 +60,48 @@ namespace Accessibility_app.Controllers
                 return NotFound();
             }
 
-            // Werk alleen de velden bij die zijn gewijzigd
-            bedrijf.Bedrijfsnaam = bedrijfUpdates.Bedrijfsnaam;
-            bedrijf.Email = bedrijfUpdates.Email;
-            bedrijf.Locatie = bedrijfUpdates.Locatie;
-            bedrijf.Omschrijving = bedrijfUpdates.Omschrijving;
-            bedrijf.PhoneNumber = bedrijfUpdates.PhoneNumber;
-            bedrijf.LinkNaarBedrijf = bedrijfUpdates.LinkNaarBedrijf;
+            // Controleer of het huidige wachtwoord correct is
+            var isCurrentPasswordValid = await _userManager.CheckPasswordAsync(bedrijf, bedrijfUpdates.CurrentPassword);
+
+            if (!isCurrentPasswordValid)
+            {
+                return BadRequest("Het huidige wachtwoord is niet correct.");
+            }
+
+            // Controleer of de email is gewijzigd
+            if (!string.IsNullOrEmpty(bedrijfUpdates.Email) && bedrijfUpdates.Email != bedrijf.Email)
+            {
+                // Update de username (email) en normalisatie
+                bedrijf.Email = bedrijfUpdates.Email;
+                bedrijf.UserName = bedrijfUpdates.Email; // Als username gelijk is aan email
+                bedrijf.NormalizedEmail = bedrijfUpdates.Email.ToUpper();
+                bedrijf.NormalizedUserName = bedrijfUpdates.Email.ToUpper(); // Normaliseer de username
+            }
+
+            if (!string.IsNullOrEmpty(bedrijfUpdates.Bedrijfsnaam))
+            {
+                bedrijf.Bedrijfsnaam = bedrijfUpdates.Bedrijfsnaam;
+            }
+
+            if (!string.IsNullOrEmpty(bedrijfUpdates.Locatie) && bedrijfUpdates.Locatie != bedrijf.Locatie)
+            {
+                bedrijf.Locatie = bedrijfUpdates.Locatie;
+            }
+
+            if (!string.IsNullOrEmpty(bedrijfUpdates.Omschrijving) && bedrijfUpdates.Omschrijving != bedrijf.Omschrijving)
+            {
+                bedrijf.Omschrijving = bedrijfUpdates.Omschrijving;
+            }
+
+            if (!string.IsNullOrEmpty(bedrijfUpdates.PhoneNumber) && bedrijfUpdates.PhoneNumber != bedrijf.PhoneNumber)
+            {
+                bedrijf.PhoneNumber = bedrijfUpdates.PhoneNumber;
+            }
+
+            if (!string.IsNullOrEmpty(bedrijfUpdates.LinkNaarBedrijf) && bedrijfUpdates.LinkNaarBedrijf != bedrijf.LinkNaarBedrijf)
+            {
+                bedrijf.LinkNaarBedrijf = bedrijfUpdates.LinkNaarBedrijf;
+            }
 
             try
             {
@@ -76,6 +113,8 @@ namespace Accessibility_app.Controllers
                 return BadRequest("Er is een fout opgetreden bij het bijwerken van het bedrijf.");
             }
         }
+
+
 
         // DELETE api/<BedrijfController>/5
         [HttpDelete("{id}")]
@@ -97,5 +136,6 @@ namespace Accessibility_app.Controllers
 
             return NoContent();
         }
+
     }
 }
