@@ -21,26 +21,11 @@ using Response = Accessibility_backend.Modellen.Registreermodellen.Response;
 [ApiController]
 public class AuthenticatieController : ControllerBase
 {
-	private readonly UserManager<Gebruiker> _userManager;
-	private readonly RoleManager<Rol> _roleManager;
-	private readonly IConfiguration _configuration;
-	private readonly ApplicationDbContext _context;
-	private readonly IEmailSender _emailSender;
     private readonly IAuthenticatieService _authenticatieService;
 
     public AuthenticatieController(
-		UserManager<Gebruiker> userManager,
-		RoleManager<Rol> roleManager,
-		IConfiguration configuration,
-		ApplicationDbContext applicationDbContext,
-		IEmailSender emailSender,
         IAuthenticatieService authenticatieService)
 	{
-		_context = applicationDbContext;
-		_userManager = userManager;
-		_roleManager = roleManager;
-		_configuration = configuration;
-		_emailSender = emailSender;
 		_authenticatieService = authenticatieService;
 	}
 
