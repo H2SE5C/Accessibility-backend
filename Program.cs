@@ -7,6 +7,7 @@ using System.Text;
 using Accessibility_app.Models;
 using Accessibility_backend.Modellen.Extra;
 using Accessibility_backend;
+using Accessibility_backend.Services;
 
 var CorsPolicyName = "AllowOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -77,6 +78,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddTransient<IEmailSender, EmailSender>();
+/*builder.Services.AddScoped<IAuthenticatieService, AuthenticatieService>();*/
 
 var app = builder.Build();
 

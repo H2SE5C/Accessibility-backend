@@ -3,6 +3,7 @@ using Accessibility_app.Models;
 using Accessibility_backend;
 using Accessibility_backend.Modellen.Extra;
 using Accessibility_backend.Modellen.Registreermodellen;
+using Accessibility_backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -25,34 +26,23 @@ public class AuthenticatieController : ControllerBase
 	private readonly IConfiguration _configuration;
 	private readonly ApplicationDbContext _context;
 	private readonly IEmailSender _emailSender;
+    private readonly IAuthenticatieService _authenticatieService;
 
-
-	public AuthenticatieController(
+    public AuthenticatieController(
 		UserManager<Gebruiker> userManager,
 		RoleManager<Rol> roleManager,
 		IConfiguration configuration,
 		ApplicationDbContext applicationDbContext,
-		IEmailSender emailSender)
+		IEmailSender emailSender,
+        IAuthenticatieService authenticatieService)
 	{
 		_context = applicationDbContext;
 		_userManager = userManager;
 		_roleManager = roleManager;
 		_configuration = configuration;
 		_emailSender = emailSender;
+		_authenticatieService = authenticatieService;
 	}
-
-	//dit kan ergens anders zodat bedrijf het ook kan gebruiken misschien? idk
-	[HttpGet("/verifieer")]
-	public async Task<IActionResult> VerifieerEmail(string token, string email)
-	{
-		var gebruiker = await _userManager.FindByEmailAsync(email);
-		if (gebruiker == null)
-			return BadRequest(new Response { Status = "Error", Message = "Geen gebruiker gevonden" });
-
-		await _userManager.ConfirmEmailAsync(gebruiker, token);
-		return Ok("Geverifieerd! U kan dit venster sluiten.");
-	}
-
 	[HttpPost]
 	[Route("login")]
 	public async Task<IActionResult> Login([FromBody] LoginModel model)
