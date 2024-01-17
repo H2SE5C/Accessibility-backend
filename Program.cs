@@ -8,6 +8,9 @@ using Accessibility_app.Models;
 using Accessibility_backend.Modellen.Extra;
 using Accessibility_backend;
 using Accessibility_backend.Services;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 
 var CorsPolicyName = "AllowOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -76,9 +79,12 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
-/*builder.Services.AddScoped<IAuthenticatieService, AuthenticatieService>();*/
+builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();
+builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
+builder.Services.AddScoped<IAuthenticatieService, AuthenticatieService>();
 
 var app = builder.Build();
 
