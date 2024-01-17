@@ -117,8 +117,56 @@ namespace Accessibility_app.Controllers
 			return Ok(hulpmiddelen);
 		}
 
-		// PUT api/<ErvaringsdeskundigeController>/5
-		[HttpPut("{id}")]
+        // PUT api/ervaringsdeskundige/update
+        [Authorize]
+        [HttpPut("update")]
+        public async Task<IActionResult> PutErvaringsdeskundige([FromBody] ErvaringsdeskundigeDto ervaringsdeskundigeUpdates)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var ervaringsdeskundige = await _context.Ervaringsdeskundigen.FirstOrDefaultAsync(b => b.Id == int.Parse(userId));
+
+            if (ervaringsdeskundige == null)
+            {
+                return NotFound();
+            }
+
+            // Werk alleen de velden bij die zijn gewijzigd
+            ervaringsdeskundige.Voornaam = ervaringsdeskundigeUpdates.Voornaam;
+            ervaringsdeskundige.Achternaam = ervaringsdeskundigeUpdates.Achternaam;
+            
+            //ervaringsdeskundige.Email = ervaringsdeskundigeUpdates.Email;
+            ervaringsdeskundige.Postcode = ervaringsdeskundigeUpdates.Postcode;
+            //ervaringsdeskundige.PhoneNumber = ervaringsdeskundigeUpdates.PhoneNumber;
+            ervaringsdeskundige.Commerciële = ervaringsdeskundigeUpdates.Commercerciële;
+            ervaringsdeskundige.Minderjarig = ervaringsdeskundige.Minderjarig;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok(ervaringsdeskundige); // Geef bijgewerkte gegevens terug als succesvol
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest("Er is een fout opgetreden bij het bijwerken van het profiel.");
+            }
+        }
+
+        // DELETE api/ervaringsdeskundige/delete
+        [Authorize]
+        [HttpDelete("delete-profiel")]
+        public async Task<IActionResult> DeleteErvaringsdeskundige()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var ervaringsdeskundige = await _context.Ervaringsdeskundigen.FirstOrDefaultAsync(b => b.Id == int.Parse(userId));
+
+            _context.Ervaringsdeskundigen.Remove(ervaringsdeskundige);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // PUT api/<ErvaringsdeskundigeController>/5
+        [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
         }
