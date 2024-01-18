@@ -18,6 +18,7 @@ using Response = Accessibility_backend.Modellen.Registreermodellen.Response;
 
 namespace Accessibility_backend.Services
 {
+    //Moet nog opgesplitst worden naar repositories
     public class AuthenticatieService : IAuthenticatieService
     {
         private readonly UserManager<Gebruiker> _userManager;
@@ -25,24 +26,18 @@ namespace Accessibility_backend.Services
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IUrlHelperFactory _urlHelperFactory;
-        private readonly IActionContextAccessor _actionContextAccessor;
         public AuthenticatieService(
         UserManager<Gebruiker> userManager,
         RoleManager<Rol> roleManager,
         IConfiguration configuration,
         ApplicationDbContext applicationDbContext,
-        IHttpContextAccessor httpContextAccessor,
-        IUrlHelperFactory urlHelperFactory,
-        IActionContextAccessor actionContextAccessor)
+        IHttpContextAccessor httpContextAccessor)
         {
             _context = applicationDbContext;
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
-            _urlHelperFactory = urlHelperFactory;
-            _actionContextAccessor = actionContextAccessor;
         }
         public async Task<IActionResult> VerifieerEmail(string token, string email)
         {
@@ -315,7 +310,6 @@ namespace Accessibility_backend.Services
         }
         public async Task<IActionResult> RegistreerErvaringsdeskundige(RegistrerenErvaringdeskundige model)
         {
-
             var userExists = await _userManager.FindByEmailAsync(model.Email);
             var rol = await RolMaak("Ervaringsdeskundige");
             var Hulpmiddelen = _context.Hulpmiddelen.Where(a => model.Hulpmiddelen.Select(aa => aa.Id).Contains(a.Id)).ToList();
