@@ -81,23 +81,22 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker, Rol, int>
 			new { Id = 3, Naam = "Contrast- en kleurinstellingen" },
 			new { Id = 4, Naam = "Aangepaste toetsenborden" }
 			);
-		/*builder.Entity<Rol>().HasData(
+/*		builder.Entity<Rol>().HasData(
 			new { Id = 1, Naam = "Ervaringsdeskundige", Name = "Ervaringsdeskundige" },
 			new { Id = 2, Naam = "Bedrijf", Name = "Bedrijf" },
 			new { Id = 3, Naam = "Medewerker", Name = "Medewerker" },
 			new { Id = 4, Naam = "Beheerder", Name = "Beheerder" }
-			);
-		builder.Entity<Ervaringsdeskundige>().HasData(
+			);*/
+		/*builder.Entity<Ervaringsdeskundige>().HasData(
 			new
 			{
-				Id = 1,
-				Rol = 1,
+				Rol = new Rol { Naam= "Ervaringsdeskundige" },
 				Voornaam = "Johnny",
 				Achternaam = "Bakker",
 				Postcode = "5847DE",
+				UserName = "ervaringsdeskundige@gmail.com",
 				Email = "ervaringsdeskundige@gmail.com",
 				PhoneNumber = "0694343273",
-
 				Minderjarig = false,
 				Hulpmiddelen = new Hulpmiddel(),
 				Aandoeningen = new List<int> { 1, 2 },
