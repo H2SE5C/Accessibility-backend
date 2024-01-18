@@ -1,5 +1,8 @@
-﻿using Accessibility_backend.Modellen.Registreermodellen;
+﻿using Accessibility_app.Models;
+using Accessibility_backend;
+using Accessibility_backend.Modellen.Registreermodellen;
 using Accessibility_backend.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -9,11 +12,13 @@ using Microsoft.AspNetCore.Mvc;
 public class AuthenticatieController : ControllerBase
 {
     private readonly IAuthenticatieService _authenticatieService;
-
-    public AuthenticatieController(
-        IAuthenticatieService authenticatieService)
+	private readonly IEmailSender _emailSender;
+	public AuthenticatieController(
+        IAuthenticatieService authenticatieService,
+		IEmailSender emailSender)
 	{
 		_authenticatieService = authenticatieService;
+		_emailSender = emailSender;
 	}
 
 	//dit kan ergens anders zodat bedrijf het ook kan gebruiken misschien? idk
@@ -127,7 +132,14 @@ public class AuthenticatieController : ControllerBase
 	public async Task<IActionResult> RegistreerErvaringsdeskundige([FromBody] RegistrerenErvaringdeskundige model)
 	{
         var result = await _authenticatieService.RegistreerErvaringsdeskundige(model);
-        return result;
+		if (result is OkObjectResult okObjectResult)
+		{
+			//het geeft email daarna token
+			dynamic data = okObjectResult.Value;
+			var emailResult = await VerificatieEmailVerzenden(data.Email, data.Token);
+			return emailResult;
+		}
+		return result;
     }
 
 	[HttpDelete("{id}")]
@@ -137,4 +149,15 @@ public class AuthenticatieController : ControllerBase
         var result = await _authenticatieService.VerwijderGebruiker(id);
         return result;
     }
+
+	private async Task<IActionResult> VerificatieEmailVerzenden(string email, string token)
+	{
+		var link = Url.Action(nameof(VerifieerEmail), "Authenticatie", new { token, email }, Request.Scheme);
+		var result = await _emailSender.SendEmailAsync(email, "Verifieer email - Accessibility", link);
+
+		if (result.Status.Equals("Success")) {
+			return Ok(result);
+		}
+		return BadRequest(result);
+	}
 }

@@ -1,5 +1,6 @@
 ﻿using Accessibility_app.Data;
 using Accessibility_app.Models;
+using Accessibility_backend.Modellen.DTO;
 using Accessibility_backend.Modellen.Extra;
 using Accessibility_backend.Modellen.Registreermodellen;
 using Azure.Core;
@@ -23,7 +24,6 @@ namespace Accessibility_backend.Services
         private readonly RoleManager<Rol> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
-        private readonly IEmailSender _emailSender;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUrlHelperFactory _urlHelperFactory;
         private readonly IActionContextAccessor _actionContextAccessor;
@@ -32,7 +32,6 @@ namespace Accessibility_backend.Services
         RoleManager<Rol> roleManager,
         IConfiguration configuration,
         ApplicationDbContext applicationDbContext,
-        IEmailSender emailSender,
         IHttpContextAccessor httpContextAccessor,
         IUrlHelperFactory urlHelperFactory,
         IActionContextAccessor actionContextAccessor)
@@ -41,7 +40,6 @@ namespace Accessibility_backend.Services
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
-            _emailSender = emailSender;
             _httpContextAccessor = httpContextAccessor;
             _urlHelperFactory = urlHelperFactory;
             _actionContextAccessor = actionContextAccessor;
@@ -51,7 +49,7 @@ namespace Accessibility_backend.Services
             var gebruiker = await _userManager.FindByEmailAsync(email);
             if (gebruiker == null) {
 
-                return new BadRequestObjectResult(new Response{ Status = "Error", Message = "Geen gebruiker gevonden" });
+                return new NotFoundObjectResult(new Response{ Status = "Error", Message = "Geen gebruiker gevonden" });
             }
             await _userManager.ConfirmEmailAsync(gebruiker, token);
             return new OkObjectResult("Geverifieerd! U kan dit venster sluiten.");
@@ -62,7 +60,7 @@ namespace Accessibility_backend.Services
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                return new BadRequestObjectResult(new Response { Status = "Error", Message = "Geen gebruiker gevonden" });
+                return new NotFoundObjectResult(new Response { Status = "Error", Message = "Geen gebruiker gevonden" });
             };
             if (!user.EmailConfirmed)
             {
@@ -370,14 +368,11 @@ namespace Accessibility_backend.Services
                 return new BadRequestObjectResult(new Response { Status = "Error", Message = "Wachtwoord is verkeerd" });
             }
 
+			var token = await _userManager.GenerateEmailConfirmationTokenAsync(ervaringsdeskundige);
+
+			await _userManager.AddToRoleAsync(ervaringsdeskundige, "Ervaringsdeskundige");
+			return new OkObjectResult(new VoorbereidingEmailModel { Email = ervaringsdeskundige.Email, Token = token});
             //email verzend stuk kan ook misschien een methode worden?
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(ervaringsdeskundige);
-            var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
-            var link = urlHelper.Action(nameof(VerifieerEmail), "Authenticatie", new { token, email = ervaringsdeskundige.Email }, _httpContextAccessor.HttpContext.Request.Scheme);
-            await _emailSender.SendEmailAsync(ervaringsdeskundige.Email, "Verifieer email - Accessibility", link);
-            await _userManager.AddToRoleAsync(ervaringsdeskundige, "Ervaringsdeskundige");
-            /*	await _userManager.AddToRoleAsync(ervaringsdeskundige, "Ervaringsdeskundige");*/
-            return new OkObjectResult(new Response { Status = "Success", Message = "Er is een verificatie email verstuurd naar: " + ervaringsdeskundige.Email /*+ "! LINK:" + link*/ });
         }
         public async Task<IActionResult> VerwijderGebruiker(string id)
         {
