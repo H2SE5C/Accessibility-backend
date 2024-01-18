@@ -107,7 +107,7 @@ public class ApplicationDbContext : IdentityDbContext<Gebruiker, Rol, int>
 				Commerciële = false,
 				Beschikbaarheidsdata = new Beschikbaarheid(),
 				Voogd = new Voogd()
-			}
+				}
 			);*/
 	}
 }
