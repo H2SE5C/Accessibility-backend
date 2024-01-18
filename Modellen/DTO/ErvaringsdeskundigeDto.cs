@@ -5,9 +5,12 @@ namespace Accessibility_backend.Modellen.Registreermodellen
 	public class ErvaringsdeskundigeDto
 	{
 		public int Id { get; set; }
+		public string UserName { get; set; }
 		public string Voornaam { get; set; }
 		public string Achternaam { get; set; }
+		public string Email { get; set; }
 		public string Postcode { get; set; }
+		public string PhoneNumber { get; set; }
 		public bool Minderjarig { get; set; }
 		public List<HulpmiddelDto> Hulpmiddelen { get; set; }
 		public List<AandoeningDto> Aandoeningen { get; set; }
