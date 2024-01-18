@@ -7,10 +7,10 @@ namespace Accessibility_backend.Modellen.Registreermodellen
 
         [EmailAddress]
         [Required(ErrorMessage = "Email is vereist")]
-        public string? Email { get; set; }
+        public string Email { get; set; }
 
         [Required(ErrorMessage = "Wachtwoord is vereist")]
-        public string? Wachtwoord{ get; set; }
+        public string Wachtwoord{ get; set; }
 
         [Required(ErrorMessage = "Bedrijfsnaam is vereist")]
         public string? Bedrijfsnaam { get; set; }
@@ -18,7 +18,7 @@ namespace Accessibility_backend.Modellen.Registreermodellen
         [Required(ErrorMessage = "Omschrijving is vereist")]
         public string? Omschrijving { get; set; }
 
-        [Required(ErrorMessage = "Telephone nummer is vereist")]
+        [Required(ErrorMessage = "Telefoon nummer is vereist")]
         public string PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "Locatie is vereist")]
