@@ -3,16 +3,12 @@ using Accessibility_app.Models;
 using Accessibility_backend.Modellen.DTO;
 using Accessibility_backend.Modellen.Extra;
 using Accessibility_backend.Modellen.Registreermodellen;
-using Azure.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Policy;
 using System.Text;
 using Response = Accessibility_backend.Modellen.Registreermodellen.Response;
 
@@ -55,7 +51,7 @@ namespace Accessibility_backend.Services
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                return new NotFoundObjectResult(new Response { Status = "Error", Message = "Geen gebruiker gevonden" });
+                return new NotFoundObjectResult(new Response { Status = "Error", Message = "Email/wachtwoord is incorrect" });
             };
             if (!user.EmailConfirmed)
             {
@@ -69,7 +65,7 @@ namespace Accessibility_backend.Services
             }
             if (!await _userManager.CheckPasswordAsync(user, model.Wachtwoord))
             {
-                return new BadRequestObjectResult(new Response { Status = "Error", Message = "Wachtwoord fout" });
+                return new BadRequestObjectResult(new Response { Status = "Error", Message = "Email/wachtwoord is incorrect" });
             };
 
             /*if (user != null && await _userManager.CheckPasswordAsync(user, model.Wachtwoord))
@@ -264,7 +260,7 @@ namespace Accessibility_backend.Services
             var result = await _userManager.CreateAsync(medewerker, model.Wachtwoord);
             if (!result.Succeeded)
             {
-                return new BadRequestObjectResult(new Response { Status = "Error", Message = "Wachtwoord is verkeerd" });
+                return new BadRequestObjectResult(new Response { Status = "Error", Message = "Formaat van wachtwoord is niet correct" });
             }
 
             await _userManager.AddToRoleAsync(medewerker, rolNaam);
@@ -302,7 +298,7 @@ namespace Accessibility_backend.Services
             var result = await _userManager.CreateAsync(bedrijf, model.Wachtwoord);
             if (!result.Succeeded)
             {
-                return new BadRequestObjectResult(new Response { Status = "Error", Message = "Wachtwoord is verkeerd" });
+                return new BadRequestObjectResult(new Response { Status = "Error", Message = "Formaat van wachtwoord is niet correct" });
             }
 
             await _userManager.AddToRoleAsync(bedrijf, rolNaam);
@@ -359,7 +355,7 @@ namespace Accessibility_backend.Services
             var result = await _userManager.CreateAsync(ervaringsdeskundige, model.Wachtwoord);
             if (!result.Succeeded)
             {
-                return new BadRequestObjectResult(new Response { Status = "Error", Message = "Wachtwoord is verkeerd" });
+                return new BadRequestObjectResult(new Response { Status = "Error", Message = "Formaat van wachtwoord is niet correct" });
             }
 
 			var token = await _userManager.GenerateEmailConfirmationTokenAsync(ervaringsdeskundige);
