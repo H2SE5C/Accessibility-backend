@@ -8,7 +8,7 @@ namespace Accessibility_app.Models
 	public class Gebruiker : IdentityUser<int>
     {
 		public DateTime LaatstIngelogd { get; set; } = DateTime.Now;
-		public List<Bericht>? Berichten { get; set; } = new();
+		public List<Chat> Chats { get; set; } = new();
 		public Rol Rol { get; set; }
 
 		public string? RefreshToken { get; set; }

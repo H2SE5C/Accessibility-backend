@@ -7,6 +7,5 @@ namespace Accessibility_app.Models
 	public class Medewerker : Gebruiker
     {
         public string Naam { get; set; }
-        public List<Chat> ChatLijst { get; set; } = new();
     }
 }

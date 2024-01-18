@@ -8,8 +8,9 @@ namespace Accessibility_app.Models
     {
 		public int Id { get; set; }
 		public List<Bericht> Berichten { get; } = new();
-        public DateTime Aanmaakdatum { get; set; }
-        public int? OnderzoekId { get; set; }
+        public DateTime Aanmaakdatum { get; set; } = DateTime.Now;
+		public int? OnderzoekId { get; set; }
         public Onderzoek? Onderzoek { get; set; }
+        public List<Gebruiker> Gebruikers { get; set; }
     }
 }
