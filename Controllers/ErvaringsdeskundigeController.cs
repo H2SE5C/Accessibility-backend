@@ -133,7 +133,7 @@ namespace Accessibility_app.Controllers
             // Werk alleen de velden bij die zijn gewijzigd
             ervaringsdeskundige.Voornaam = ervaringsdeskundigeUpdates.Voornaam;
             ervaringsdeskundige.Achternaam = ervaringsdeskundigeUpdates.Achternaam;
-            
+
             //ervaringsdeskundige.Email = ervaringsdeskundigeUpdates.Email;
             ervaringsdeskundige.Postcode = ervaringsdeskundigeUpdates.Postcode;
             //ervaringsdeskundige.PhoneNumber = ervaringsdeskundigeUpdates.PhoneNumber;
