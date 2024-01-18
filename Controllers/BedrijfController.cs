@@ -14,11 +14,12 @@ namespace Accessibility_app.Controllers
     public class BedrijfController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<Bedrijf> _userManager;
+        private readonly UserManager<Gebruiker> _userManager;
 
-        public BedrijfController(ApplicationDbContext context)
+        public BedrijfController(ApplicationDbContext context, UserManager<Gebruiker> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: api/<BedrijfController>
@@ -60,22 +61,14 @@ namespace Accessibility_app.Controllers
                 return NotFound();
             }
 
-            // Controleer of het huidige wachtwoord correct is
-            var isCurrentPasswordValid = await _userManager.CheckPasswordAsync(bedrijf, bedrijfUpdates.CurrentPassword);
-
-            if (!isCurrentPasswordValid)
-            {
-                return BadRequest("Het huidige wachtwoord is niet correct.");
-            }
-
             // Controleer of de email is gewijzigd
             if (!string.IsNullOrEmpty(bedrijfUpdates.Email) && bedrijfUpdates.Email != bedrijf.Email)
             {
                 // Update de username (email) en normalisatie
                 bedrijf.Email = bedrijfUpdates.Email;
-                bedrijf.UserName = bedrijfUpdates.Email; // Als username gelijk is aan email
+                bedrijf.UserName = bedrijfUpdates.Email;
                 bedrijf.NormalizedEmail = bedrijfUpdates.Email.ToUpper();
-                bedrijf.NormalizedUserName = bedrijfUpdates.Email.ToUpper(); // Normaliseer de username
+                bedrijf.NormalizedUserName = bedrijfUpdates.Email.ToUpper();
             }
 
             if (!string.IsNullOrEmpty(bedrijfUpdates.Bedrijfsnaam))
@@ -114,7 +107,52 @@ namespace Accessibility_app.Controllers
             }
         }
 
+        // Voeg deze methode toe aan BedrijfController
+        [Authorize]
+        [HttpPut("wachtwoord-change")]
+        public async Task<IActionResult> ChangePassword([FromBody] WachtwoordDTO passwordChangeDto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var bedrijf = await _context.Bedrijven.FirstOrDefaultAsync(b => b.Id == int.Parse(userId));
 
+            if (bedrijf == null)
+            {
+                return NotFound();
+            }
+
+            var isCurrentPasswordValid = await _userManager.CheckPasswordAsync(bedrijf, passwordChangeDto.CurrentPassword);
+
+            if (!isCurrentPasswordValid)
+            {
+                return BadRequest("Het huidige wachtwoord is niet correct.");
+            }
+
+            var result = await _userManager.ChangePasswordAsync(bedrijf, passwordChangeDto.CurrentPassword, passwordChangeDto.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest("Er is een fout opgetreden bij het wijzigen van het wachtwoord.");
+            }
+
+            return Ok("Wachtwoord succesvol gewijzigd");
+        }
+
+        [Authorize]
+        [HttpPut("wachtwoord-check")]
+        public async Task<IActionResult> CheckPassword([FromBody] WachtwoordDTO passwordCheckDto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var bedrijf = await _context.Bedrijven.FirstOrDefaultAsync(b => b.Id == int.Parse(userId));
+
+            if (bedrijf == null)
+            {
+                return NotFound();
+            }
+
+            var isPasswordValid = await _userManager.CheckPasswordAsync(bedrijf, passwordCheckDto.CurrentPassword);
+
+            return Ok(new { IsValid = isPasswordValid });
+        }
 
         // DELETE api/<BedrijfController>/5
         [HttpDelete("{id}")]
