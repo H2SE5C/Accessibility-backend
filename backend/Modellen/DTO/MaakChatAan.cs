@@ -3,8 +3,7 @@
 	public class MaakChatAan
 	{
 		public int? OnderzoekId { get; set; }
-		public int? Gebruiker1 { get; set; }
-		public int? Gebruiker2 { get; set; }
+		public int? AnderePersoonId { get; set; }
 
 	}
 }

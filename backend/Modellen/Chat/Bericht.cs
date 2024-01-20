@@ -9,7 +9,8 @@ namespace Accessibility_app.Models
         public int Id { get; set; }
         public string Tekst { get; set; }
         public DateTime Tijdstempel { get; set; } = DateTime.Now;
-		public string VerzenderEmail { get; set; } = null!;
+		public int VerzenderId { get; set; }
+		public Gebruiker Verzender { get; set; }
 		public Chat Chat { get; set; } = null!;
     }
 }

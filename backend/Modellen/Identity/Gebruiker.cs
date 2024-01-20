@@ -10,7 +10,6 @@ namespace Accessibility_app.Models
 		public DateTime LaatstIngelogd { get; set; } = DateTime.Now;
 		public List<Chat> Chats { get; set; } = new();
 		public Rol Rol { get; set; }
-
 		public string? RefreshToken { get; set; }
 		/*public override string UserName
 		{

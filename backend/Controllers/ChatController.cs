@@ -25,22 +25,41 @@ namespace Accessibility_app.Controllers
 		}
 		// GET: api/<ChatController>
 		[HttpGet]
-		public async Task<IActionResult> GetChats()
+		public async Task<IActionResult> GetChatsVanGebruiker()
 		{
 			var id = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+			var result = await _context.Chats
+				.Include(chat => chat.Gebruikers)
+				.Where(chat => chat.Gebruikers.Any(gebruiker => gebruiker.Id == id))
+				.Select(chat => new ChatDto { 
+					Id = chat.Id,
+					Aanmaakdatum = chat.Aanmaakdatum,
+					//dit stukje pakt de andere persoon dat in chat lijstje staat
+					Gebruikers = chat.Gebruikers.Where(gebruiker => gebruiker.Id != id).Select(gebruiker => new ChatGebruikerDto { 
+						Id = gebruiker.Id,
+						Email = gebruiker.Email
+					}).ToList(),
+				})
+				.ToListAsync();
 			//misschien nog check als gebruikers lijst null is?
-			return Ok(await _context.Chats.ToListAsync());
+			return Ok(result);
 		}
 
 		[HttpPost]
 		//bij ed maak je een chat aan met 2 gebruikers 
 		//bij onderzoek maak je een lege met alleen onderzoekid erbij
-		//onderzoek kan knop hebben naar chat met api methode dat checkt of er al chat met de bedrijf bestaat als niet dan maakt die er een aan
 		public async Task<IActionResult> MaakChat([FromBody] MaakChatAan model)
 		{
 			if (!ModelState.IsValid)
 			{
 				return BadRequest(new Response { Status = "Error", Message = "Vul goed in!" });
+			}
+
+			var id = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+			var chatBestaatAl = _context.Chats.Where(c => c.Gebruikers.Any(u => u.Id == id) && c.Gebruikers.Any(u => u.Id == model.AnderePersoonId)).Any();
+
+			if (chatBestaatAl) {
+				return BadRequest(new Response { Status = "Error", Message = "U heeft al een chat met dit gebruiker..." });
 			}
 			var chat = new Chat();
 			try
@@ -49,15 +68,15 @@ namespace Accessibility_app.Controllers
 				{
 					chat.OnderzoekId = model.OnderzoekId;
 				}
-				else if (model.Gebruiker1 != null && model.Gebruiker2 != null)
+				else if (model.AnderePersoonId != null)
 				{
-					if (model.Gebruiker1 == model.Gebruiker2)
+					if (id == model.AnderePersoonId)
 					{
 						return BadRequest(new Response { Status = "Error", Message = "Zelfde gebruiker?" });
 					}
 					
-					var gebruiker1 = await _userManager.FindByIdAsync(model.Gebruiker1.ToString());
-					var gebruiker2 = await _userManager.FindByIdAsync(model.Gebruiker2.ToString());
+					var gebruiker1 = await _userManager.FindByIdAsync(id.ToString());
+					var gebruiker2 = await _userManager.FindByIdAsync(model.AnderePersoonId.ToString());
 					chat.Gebruikers = new()
 					{
 						gebruiker1,
@@ -86,6 +105,10 @@ namespace Accessibility_app.Controllers
 		{
 			var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 			var gebruiker = await _userManager.FindByIdAsync(id);
+
+			if (gebruiker == null) {
+				return BadRequest(new Response { Status = "Error", Message = "Gebruiker niet gevonden" });
+			}
 			if (model.ChatId != null)
 			{
 				var chat = await _context.Chats.FirstOrDefaultAsync(c => c.Id == model.ChatId);
@@ -94,7 +117,7 @@ namespace Accessibility_app.Controllers
 					var bericht = new Bericht()
 					{
 						Tekst = model.Tekst,
-						VerzenderEmail = gebruiker.Email,
+						Verzender = gebruiker,
 						Chat = chat
 					};
 					await _context.Berichten.AddAsync(bericht);
