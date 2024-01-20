@@ -11,6 +11,7 @@ namespace Accessibility_app.Models
         public DateTime Tijdstempel { get; set; } = DateTime.Now;
 		public int VerzenderId { get; set; }
 		public Gebruiker Verzender { get; set; }
+        public int ChatId { get; set; }
 		public Chat Chat { get; set; } = null!;
     }
 }
