@@ -1,11 +1,13 @@
 ﻿using Accessibility_app.Data;
 using Accessibility_app.Models;
+using Accessibility_backend.Modellen.DTO;
 using Accessibility_backend.Modellen.Registreermodellen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using NuGet.Versioning;
+using System.Collections;
 using System.Collections.Generic;
 using System.Security.Claims;
 
@@ -57,7 +59,78 @@ namespace Accessibility_app.Controllers
 			return Ok(onderzoeken);
 		}
 
-		[Authorize(Roles = "Bedrijf")]
+        [HttpGet("medewerker")]
+        public async Task<IActionResult> GetOnderzoekenStatus()
+        {
+            var onderzoeken = new ArrayList();
+            var onderzoekenGoedgekeurd = await _context.Onderzoeken
+                .Include(o => o.Bedrijf)
+                .Include(o => o.TypeOnderzoek)
+				.Where(o=>o.Status == "goedgekeurd")
+                .Select(o => new OnderzoekDto
+                {
+                    Id = o.Id,
+                    Titel = o.Titel,
+                    Omschrijving = o.Omschrijving,
+                    Vragenlijst = o.Vragenlijst.Id,
+                    Beloning = o.Beloning,
+                    Status = o.Status,
+                    Bedrijf = o.Bedrijf.Bedrijfsnaam,
+                    Datum = o.Datum,
+                    Ervaringsdeskundigen = o.Ervaringsdeskundigen.Select(e => new deskundigeEmailDto
+                    {
+                        Id = e.Id,
+                        Email = e.Email,
+                    }).ToList(),
+                    Beperkingen = o.Beperkingen.Select(b => new BeperkingDto
+                    {
+                        Id = b.Id,
+                        Naam = b.Naam
+                    }).ToList(),
+                    TypeOnderzoek = o.TypeOnderzoek.Naam
+                })
+                .ToListAsync();
+
+            var onderzoekenAnderen = await _context.Onderzoeken
+                .Include(o => o.Bedrijf)
+                .Include(o => o.TypeOnderzoek)
+                .Where(o => o.Status == "aanvraag")
+                .Select(o => new OnderzoekDto
+                {
+                    Id = o.Id,
+                    Titel = o.Titel,
+                    Omschrijving = o.Omschrijving,
+                    Vragenlijst = o.Vragenlijst.Id,
+                    Beloning = o.Beloning,
+                    Status = o.Status,
+                    Bedrijf = o.Bedrijf.Bedrijfsnaam,
+                    Datum = o.Datum,
+                    Ervaringsdeskundigen = o.Ervaringsdeskundigen.Select(e => new deskundigeEmailDto
+                    {
+                        Id = e.Id,
+                        Email = e.Email,
+                    }).ToList(),
+                    Beperkingen = o.Beperkingen.Select(b => new BeperkingDto
+                    {
+                        Id = b.Id,
+                        Naam = b.Naam
+                    }).ToList(),
+                    TypeOnderzoek = o.TypeOnderzoek.Naam
+                })
+                .ToListAsync();
+
+            var response = new OnderzoekenResponse
+            {
+                Goedgekeurd = onderzoekenGoedgekeurd,
+                Aanvragen = onderzoekenAnderen
+            };
+
+
+            return Ok(response);
+        }
+
+
+        [Authorize(Roles = "Bedrijf")]
 		// GET: api/<OnderzoekController>/Bedrijf
 		[HttpGet("Bedrijf")]
 		public async Task<IActionResult> GetOnderzoekBedrijf()
@@ -150,7 +223,7 @@ namespace Accessibility_app.Controllers
 				Titel = model.Titel,
 				Omschrijving = model.Omschrijving,
 				Beloning = model.Beloning,
-				Status = "bezig",
+				Status = "aanvraag",
 				Bedrijf =bedrijf,
 				Datum = (DateTime)model.Datum,
 				TypeOnderzoek = typeOnderzoek,
