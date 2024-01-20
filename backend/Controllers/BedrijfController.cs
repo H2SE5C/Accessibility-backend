@@ -39,8 +39,21 @@ namespace Accessibility_app.Controllers
             return Ok(bedrijf);
         }
 
-        // GET: api/<BedrijfController> (pakt eigen gegevens van bedrijf)
-        [Authorize]
+
+		[Authorize]
+		[HttpGet("chat/info")]
+        //dit is voor wanneer een ervaringsdeskundige bedrijven wilt zien om een chat aan te maken
+		public async Task<IActionResult> getMinimaalBedrijfInfo()
+		{
+			var bedrijven = await _context.Bedrijven.Where(b => b.EmailConfirmed == true).Select(b => new BedrijfVoorChatDto { 
+                Id = b.Id,
+                Bedrijfsnaam = b.Email,
+            }).ToListAsync();
+			return Ok(bedrijven);
+		}
+
+		// GET: api/<BedrijfController> (pakt eigen gegevens van bedrijf)
+		[Authorize]
         [HttpGet("profiel")]
         public async Task<IActionResult> GetBedrijf()
         {

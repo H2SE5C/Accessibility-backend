@@ -21,7 +21,7 @@ namespace Accessibility_backend.Modellen.Registreermodellen
         [Required(ErrorMessage = "TypeOnderzoek is required")]
         public String? TypeOnderzoek { get; set; }
 
-        [Required(ErrorMessage = "Beparking  is required")]
+        [Required(ErrorMessage = "Beperking is required")]
         public List<Beperking> Beperkingen { get; set; }
 
 
