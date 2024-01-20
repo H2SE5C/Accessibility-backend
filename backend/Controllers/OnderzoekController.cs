@@ -59,6 +59,40 @@ namespace Accessibility_app.Controllers
 			return Ok(onderzoeken);
 		}
 
+        [HttpGet("medewerker/{id}")]
+        public async Task<IActionResult> GetOnderzoekId(int id)
+        {
+            var onderzoek = await _context.Onderzoeken
+               .Include(o => o.Bedrijf)
+               .Include(o => o.TypeOnderzoek)
+               .Where(o => o.Id == id)
+               .Select(o => new OnderzoekDto
+               {
+                   Id = o.Id,
+                   Titel = o.Titel,
+                   Omschrijving = o.Omschrijving,
+                   Vragenlijst = o.Vragenlijst.Id,
+                   Beloning = o.Beloning,
+                   Status = o.Status,
+                   Bedrijf = o.Bedrijf.Bedrijfsnaam,
+                   Datum = o.Datum,
+                   Ervaringsdeskundigen = o.Ervaringsdeskundigen.Select(e => new deskundigeEmailDto
+                   {
+                       Id = e.Id,
+                       Email = e.Email,
+                   }).ToList(),
+                   Beperkingen = o.Beperkingen.Select(b => new BeperkingDto
+                   {
+                       Id = b.Id,
+                       Naam = b.Naam
+                   }).ToList(),
+                   TypeOnderzoek = o.TypeOnderzoek.Naam
+               })
+               .FirstAsync();
+
+            return Ok(onderzoek);
+        }
+
         [HttpGet("medewerker")]
         public async Task<IActionResult> GetOnderzoekenStatus()
         {
@@ -66,7 +100,7 @@ namespace Accessibility_app.Controllers
             var onderzoekenGoedgekeurd = await _context.Onderzoeken
                 .Include(o => o.Bedrijf)
                 .Include(o => o.TypeOnderzoek)
-				.Where(o=>o.Status == "goedgekeurd")
+				.Where(o => o.Status != "In afwachting")
                 .Select(o => new OnderzoekDto
                 {
                     Id = o.Id,
@@ -94,7 +128,7 @@ namespace Accessibility_app.Controllers
             var onderzoekenAnderen = await _context.Onderzoeken
                 .Include(o => o.Bedrijf)
                 .Include(o => o.TypeOnderzoek)
-                .Where(o => o.Status == "aanvraag")
+                .Where(o => o.Status == "In afwachting")
                 .Select(o => new OnderzoekDto
                 {
                     Id = o.Id,
@@ -175,12 +209,8 @@ namespace Accessibility_app.Controllers
 
 		}
 
-		// GET api/<OnderzoekController>/5
-		[HttpGet("{id}")]
-		public string Get(int id)
-		{
-			return "value";
-		}
+		
+		
 		/*datum form:yyyy-MM-ddTHH:mm:ss*/
 		/*voorbeeld onderzoek
 
@@ -223,7 +253,7 @@ namespace Accessibility_app.Controllers
 				Titel = model.Titel,
 				Omschrijving = model.Omschrijving,
 				Beloning = model.Beloning,
-				Status = "aanvraag",
+				Status = "In afwachting",
 				Bedrijf =bedrijf,
 				Datum = (DateTime)model.Datum,
 				TypeOnderzoek = typeOnderzoek,
@@ -239,6 +269,8 @@ namespace Accessibility_app.Controllers
 			}
 		}
 
+
+
 		[HttpGet("Beperkingen")]
 		public async Task<IActionResult> GetBeperkingen()
 		{
@@ -249,17 +281,94 @@ namespace Accessibility_app.Controllers
 
 
 
-		// PUT api/<OnderzoekController>/5
-		[HttpPut("{id}")]
-		public void Put(int id, [FromBody] OnderzoekForm onderzoeker)
-		{
+		
+		[HttpPut("AkkordStatus/{id}")]
+        public async Task<IActionResult> AkkordStatus(int id)
+        {
+            var onderzoek = await _context.Onderzoeken.FindAsync(id);
+            if (onderzoek == null)
+            {
+                return NotFound();
+            }
+            onderzoek.Status = "Actief";
 
-		}
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
 
-		// DELETE api/<OnderzoekController>/5
-		[HttpDelete("{id}")]
-		public void Delete(int id)
+            return NoContent(); // 成功更新，返回 NoContent
+        }
+
+        [HttpPut("NietAkkordStatus/{id}")]
+        public async Task<IActionResult> NietAkkordStatus(int id)
+        {
+            var onderzoek = await _context.Onderzoeken.FindAsync(id);
+            onderzoek.Status = "Afgekeurd";
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
+
+            return NoContent(); 
+        }
+
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> updateOnderzoek([FromBody] OnderzoekForm onderzoekUpdates, int id)
+        {
+            var onderzoek = await _context.Onderzoeken
+                .Include(o => o.Beperkingen)
+                .Where(o=>o.Id == id)
+                .SingleOrDefaultAsync();
+            var beperkingen = _context.Beperkingen.Where(a => onderzoekUpdates.Beperkingen.Select(aa => aa.Id).Contains(a.Id)).ToList();
+            var typeOnderzoek = await _context.TypeOnderzoeken.FirstOrDefaultAsync(t => t.Naam == onderzoekUpdates.TypeOnderzoek);
+            // Controleer of de email is gewijzigd
+
+           onderzoek.Titel = onderzoekUpdates.Titel;
+           onderzoek.Omschrijving = onderzoekUpdates.Omschrijving;
+           onderzoek.Beloning = onderzoekUpdates.Beloning;
+           onderzoek.Datum = (DateTime)onderzoekUpdates.Datum;
+           onderzoek.TypeOnderzoek = typeOnderzoek;
+           onderzoek.Beperkingen.Clear();
+            onderzoek.Beperkingen = beperkingen;
+            
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return NoContent(); // Geef bijgewerkte gegevens terug als succesvol
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest("Er is een fout opgetreden bij het bijwerken van het bedrijf.");
+            }
+        }
+
+
+        // DELETE api/<OnderzoekController>/5
+        [HttpDelete("verwijderen/{id}")]
+        public async Task<IActionResult> VerwijderOnderzoek(int id)
 		{
-		}
-	}
+			try {
+                var onderzoek = await _context.Onderzoeken.FindAsync(id);
+                 _context.Onderzoeken.Remove(onderzoek);
+                await _context.SaveChangesAsync();
+            }
+			catch
+			{
+				throw new Exception("niet gelukkig");
+			}
+            return Ok(id);
+        }
+
+    }
 }
