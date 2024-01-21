@@ -31,9 +31,29 @@ namespace Accessibility_app.Controllers
 			return Ok(await _context.Gebruikers.ToListAsync());
         }
 
-		// GET api/<GebruikerController>/5
-		// get related data with Include(). _context.Gebruikers.Where(g => g.Id == id).Include(g => g.Rol).ToListAsync()
-		[HttpGet("{id}")]
+        [HttpGet("ervaringsdeskundigen")]
+        public async Task<IActionResult> GetAllesErvaringsdeskundigen()
+        {
+            var ervaringsdeskundigen = await _context.Ervaringsdeskundigen.ToListAsync();
+            return Ok(ervaringsdeskundigen);
+        }
+
+        [HttpGet("bedrijven")]
+        public async Task<IActionResult> GetAllesBedrijf()
+        {
+            var bedrijven = await _context.Bedrijven.ToListAsync();
+            return Ok(bedrijven);
+        }
+        [HttpGet("medewerkers")]
+        public async Task<IActionResult> GetAllesMedewerker()
+        {
+            var medewerkers = await _context.Medewerkers.ToListAsync();
+            return Ok(medewerkers);
+        }
+
+        // GET api/<GebruikerController>/5
+        // get related data with Include(). _context.Gebruikers.Where(g => g.Id == id).Include(g => g.Rol).ToListAsync()
+        [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
 			var gebruiker = await _context.Gebruikers.Where(g => g.Id == id).FirstAsync();
@@ -89,16 +109,19 @@ namespace Accessibility_app.Controllers
         [HttpDelete("{id}")]
 		public async Task<IActionResult> Delete(int id)
         {
-			var gebruiker = await _context.Gebruikers.FindAsync(id);
-
-			if (gebruiker != null)
-			{
+			
+            try
+            {
+                var gebruiker = await _context.Gebruikers.FindAsync(id);
                 _context.Remove(gebruiker);
                 await _context.SaveChangesAsync();
-                return Ok(gebruiker);
-			}
+            }
+            catch
+            {
+                throw new Exception("niet gelukkig");
+            }
 
-			return NotFound();
+            return NotFound();
 		}
     }
 }
