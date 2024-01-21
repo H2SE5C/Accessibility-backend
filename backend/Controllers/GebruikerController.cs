@@ -1,7 +1,10 @@
 ﻿using Accessibility_app.Data;
 using Accessibility_app.Models;
+using Accessibility_backend;
+using Accessibility_backend.Modellen.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -14,14 +17,30 @@ namespace Accessibility_app.Controllers
     public class GebruikerController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IEmailSender _emailSender;
 
-        public GebruikerController(ApplicationDbContext applicationDbContext) { 
+        public GebruikerController(ApplicationDbContext applicationDbContext, IEmailSender emailSender) { 
             _context = applicationDbContext;
+            _emailSender = emailSender;
         }
         // GET: api/<GebruikerController>
 
-        [Authorize]
+        [HttpPut("bedrijf/{id}")]
+        public async Task<IActionResult> setEmailTrue(int id)
+        {
+            var bedrijf = await _context.Bedrijven.FindAsync(id);
+            bedrijf.EmailConfirmed = true;
+            await _context.SaveChangesAsync();
+            var result = await _emailSender.SendEmailAsync(bedrijf.Email, "Verifieer email - Accessibility", "Uw bedrijf account is actief");
 
+            if (result.Status.Equals("Success"))
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
+
+        [Authorize]
         [Authorize(Roles = "Ervaringsdeskundige")]
         [HttpGet]
         public async Task<IActionResult> GetGebruikers()
@@ -41,8 +60,15 @@ namespace Accessibility_app.Controllers
         [HttpGet("bedrijven")]
         public async Task<IActionResult> GetAllesBedrijf()
         {
-            var bedrijven = await _context.Bedrijven.ToListAsync();
-            return Ok(bedrijven);
+            var bedrijven = await _context.Bedrijven.Where(b=>b.EmailConfirmed == true).ToListAsync();
+            var bedrijvenAfwachting = await _context.Bedrijven.Where(b => b.EmailConfirmed == false).ToListAsync();
+
+            var response = new BedrijvenResponse
+            {
+                bedrijvenTrue = bedrijven,
+                bedrijvenFalse = bedrijvenAfwachting,
+            };
+            return Ok(response);
         }
         [HttpGet("medewerkers")]
         public async Task<IActionResult> GetAllesMedewerker()

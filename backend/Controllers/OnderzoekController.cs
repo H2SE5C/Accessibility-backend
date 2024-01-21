@@ -356,10 +356,6 @@ namespace Accessibility_app.Controllers
         public async Task<IActionResult> AkkordStatus(int id)
         {
             var onderzoek = await _context.Onderzoeken.FindAsync(id);
-            if (onderzoek == null)
-            {
-                return NotFound();
-            }
             onderzoek.Status = "Actief";
 
             try
