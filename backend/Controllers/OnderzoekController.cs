@@ -59,6 +59,76 @@ namespace Accessibility_app.Controllers
 			return Ok(onderzoeken);
 		}
 
+        [HttpGet("ervaringsdeskundige")]
+        public async Task<IActionResult> GetOnderzoekenActive()
+        {
+            var onderzoeken = new ArrayList();
+            var onderzoekenActive = await _context.Onderzoeken
+                .Include(o => o.Bedrijf)
+                .Include(o => o.TypeOnderzoek)
+                .Where(o => o.Status == "Actief")
+                .Select(o => new OnderzoekDto
+                {
+                    Id = o.Id,
+                    Titel = o.Titel,
+                    Omschrijving = o.Omschrijving,
+                    Vragenlijst = o.Vragenlijst.Id,
+                    Beloning = o.Beloning,
+                    Status = o.Status,
+                    Bedrijf = o.Bedrijf.Bedrijfsnaam,
+                    Datum = o.Datum,
+                    Ervaringsdeskundigen = o.Ervaringsdeskundigen.Select(e => new deskundigeEmailDto
+                    {
+                        Id = e.Id,
+                        Email = e.Email,
+                    }).ToList(),
+                    Beperkingen = o.Beperkingen.Select(b => new BeperkingDto
+                    {
+                        Id = b.Id,
+                        Naam = b.Naam
+                    }).ToList(),
+                    TypeOnderzoek = o.TypeOnderzoek.Naam
+                })
+                .ToListAsync();
+
+            var onderzoekenAnderen = await _context.Onderzoeken
+                .Include(o => o.Bedrijf)
+                .Include(o => o.TypeOnderzoek)
+                .Where(o => o.Status == "Inactief")
+                .Select(o => new OnderzoekDto
+                {
+                    Id = o.Id,
+                    Titel = o.Titel,
+                    Omschrijving = o.Omschrijving,
+                    Vragenlijst = o.Vragenlijst.Id,
+                    Beloning = o.Beloning,
+                    Status = o.Status,
+                    Bedrijf = o.Bedrijf.Bedrijfsnaam,
+                    Datum = o.Datum,
+                    Ervaringsdeskundigen = o.Ervaringsdeskundigen.Select(e => new deskundigeEmailDto
+                    {
+                        Id = e.Id,
+                        Email = e.Email,
+                    }).ToList(),
+                    Beperkingen = o.Beperkingen.Select(b => new BeperkingDto
+                    {
+                        Id = b.Id,
+                        Naam = b.Naam
+                    }).ToList(),
+                    TypeOnderzoek = o.TypeOnderzoek.Naam
+                })
+                .ToListAsync();
+
+            var response = new OnderzoekenResponse
+            {
+                onderzoekenEerste = onderzoekenActive,
+                onderzoekenTweede = onderzoekenAnderen
+            };
+
+
+            return Ok(response);
+        }
+
         [HttpGet("medewerker/{id}")]
         public async Task<IActionResult> GetOnderzoekId(int id)
         {
@@ -155,8 +225,8 @@ namespace Accessibility_app.Controllers
 
             var response = new OnderzoekenResponse
             {
-                Goedgekeurd = onderzoekenGoedgekeurd,
-                Aanvragen = onderzoekenAnderen
+                onderzoekenEerste = onderzoekenGoedgekeurd,
+                onderzoekenTweede = onderzoekenAnderen
             };
 
 
