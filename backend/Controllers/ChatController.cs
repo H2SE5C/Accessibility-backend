@@ -1,9 +1,11 @@
 ﻿using Accessibility_app.Data;
 using Accessibility_app.Models;
+using Accessibility_backend.Hubs;
 using Accessibility_backend.Modellen.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Response = Accessibility_backend.Modellen.Registreermodellen.Response;
@@ -18,10 +20,59 @@ namespace Accessibility_app.Controllers
 	{
 		private readonly ApplicationDbContext _context;
 		private readonly UserManager<Gebruiker> _userManager;
-		public ChatController(ApplicationDbContext context, UserManager<Gebruiker> userManager)
+		private readonly IHubContext<ChatHub> _chat;
+		public ChatController(ApplicationDbContext context, UserManager<Gebruiker> userManager, IHubContext<ChatHub> chat)
 		{
 			_context = context;
 			_userManager = userManager;
+			_chat = chat;
+		}
+
+		[HttpPost("[action]/{connectionId}/{chatId}")]
+		public async Task<IActionResult> JoinRoom(string connectionId, int chatId)
+		{
+			await _chat.Groups.AddToGroupAsync(connectionId, chatId.ToString());
+			return Ok();
+		}
+		[HttpPost("[action]/{connectionId}/{chatId}")]
+		public async Task<IActionResult> LeaveRoom(string connectionId, int chatId)
+		{
+			await _chat.Groups.RemoveFromGroupAsync(connectionId, chatId.ToString());
+			return Ok();
+		}
+		[HttpPost("[action]")]
+		public async Task<IActionResult> SendMessage([FromBody] MaakBerichtAan model)
+		{
+			var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			var gebruiker = await _userManager.FindByIdAsync(id);
+
+			var chat = await _context.Chats.FirstOrDefaultAsync(c => c.Id == model.ChatId);
+			if (chat != null)
+			{
+				var bericht = new Bericht()
+				{
+					Tekst = model.Tekst,
+					Verzender = gebruiker,
+					Chat = chat
+				};
+				await _context.Berichten.AddAsync(bericht);
+				await _context.SaveChangesAsync();
+
+				var berichtDto = new BerichtDto() { 
+					Id = bericht.Id,
+					Tekst = bericht.Tekst,
+					Tijdstempel = bericht.Tijdstempel.ToString("yyyy-MM-dd HH:mm"),
+					Verzender = new ChatGebruikerDto()
+					{
+						Id = gebruiker.Id,
+						Email = gebruiker.Email
+					}
+					
+				};
+				await _chat.Clients.Group(model.ChatId.ToString()).SendAsync("ReceiveMessage", berichtDto);
+				return Ok();
+			}
+			return NotFound();
 		}
 		// GET: api/<ChatController>
 		[HttpGet]
@@ -143,12 +194,13 @@ namespace Accessibility_app.Controllers
 			var chat = await _context.Chats
 				.Include(chat => chat.Gebruikers)
 				.Where(c => c.Id == chatId)
-				.Select(c => new ChatCheck() {
+				.Select(c => new ChatCheck()
+				{
 					Id = c.Id,
 					Gebruikers = c.Gebruikers.Select(g => new ChatCheckGebruiker { Id = g.Id }).ToList()
-				}) 
+				})
 				.FirstOrDefaultAsync();
-			
+
 			if (chat == null)
 			{
 				return BadRequest(new Response { Status = "Error", Message = "Geen chat gevonden voor de berichten..." });

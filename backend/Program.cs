@@ -11,6 +11,7 @@ using Accessibility_backend.Services;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Accessibility_backend.Hubs;
 
 var CorsPolicyName = "AllowOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -85,7 +86,7 @@ builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
 builder.Services.AddScoped<IAuthenticatieService, AuthenticatieService>();
-
+builder.Services.AddSignalR();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -104,7 +105,10 @@ app.UseRouting();
 app.UseCors(CorsPolicyName);
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<ChatHub>("/chat");
+});
 app.Run();
