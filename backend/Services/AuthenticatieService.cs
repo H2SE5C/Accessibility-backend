@@ -107,6 +107,7 @@ namespace Accessibility_backend.Services
                 token = new JwtSecurityTokenHandler().WriteToken(token),
                 expiration = token.ValidTo,
                 roles = userRoles,
+                email = user.Email
             });
             /* }
              return Unauthorized();*/
