@@ -349,10 +349,38 @@ namespace Accessibility_app.Controllers
 			return Ok(beperkingen);
 		}
 
+        [HttpPut("ervaringdiskundigen/{id}")]
+        public async Task<IActionResult> AddErvaringdeskundige(int id)
+        {
+            var onderzoek = await _context.Onderzoeken.FindAsync(id);
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var ervaringsdeskundige = await _context.Ervaringsdeskundigen.FindAsync(userId);
+            onderzoek.Ervaringsdeskundigen = new List<Ervaringsdeskundige> { ervaringsdeskundige };
+           /* if (onderzoek.Ervaringsdeskundigen.Any(e => e.Id == userId) && onderzoek.Ervaringsdeskundigen != null)
+            {
+                onderzoek.Ervaringsdeskundigen.Remove(ervaringsdeskundige);
+            }
+            else {
+                onderzoek.Ervaringsdeskundigen = new List<Ervaringsdeskundige> { ervaringsdeskundige };
+            }
+*/
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
+
+            return NoContent(); 
+        }
 
 
-		
-		[HttpPut("AkkordStatus/{id}")]
+
+
+
+        [HttpPut("AkkordStatus/{id}")]
         public async Task<IActionResult> AkkordStatus(int id)
         {
             var onderzoek = await _context.Onderzoeken.FindAsync(id);
