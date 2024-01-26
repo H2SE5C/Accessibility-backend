@@ -62,6 +62,7 @@ namespace Accessibility_app.Controllers
         [HttpGet("ervaringsdeskundige")]
         public async Task<IActionResult> GetOnderzoekenActive()
         {
+            var Eid = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var onderzoeken = new ArrayList();
             var onderzoekenActive = await _context.Onderzoeken
                 .Include(o => o.Bedrijf)
@@ -91,38 +92,14 @@ namespace Accessibility_app.Controllers
                 })
                 .ToListAsync();
 
-            var onderzoekenAnderen = await _context.Onderzoeken
-                .Include(o => o.Bedrijf)
-                .Include(o => o.TypeOnderzoek)
-                .Where(o => o.Status == "Inactief")
-                .Select(o => new OnderzoekDto
-                {
-                    Id = o.Id,
-                    Titel = o.Titel,
-                    Omschrijving = o.Omschrijving,
-                    Vragenlijst = o.Vragenlijst.Id,
-                    Beloning = o.Beloning,
-                    Status = o.Status,
-                    Bedrijf = o.Bedrijf.Bedrijfsnaam,
-                    Datum = o.Datum,
-                    Ervaringsdeskundigen = o.Ervaringsdeskundigen.Select(e => new deskundigeEmailDto
-                    {
-                        Id = e.Id,
-                        Email = e.Email,
-                    }).ToList(),
-                    Beperkingen = o.Beperkingen.Select(b => new BeperkingDto
-                    {
-                        Id = b.Id,
-                        Naam = b.Naam
-                    }).ToList(),
-                    TypeOnderzoek = o.TypeOnderzoek.Naam
-                })
-                .ToListAsync();
-
             var response = new OnderzoekenResponse
             {
-                onderzoekenEerste = onderzoekenActive,
-                onderzoekenTweede = onderzoekenAnderen
+                onderzoekenEerste = onderzoekenActive
+                                    .Where(o => !o.Ervaringsdeskundigen.Any(e => e.Id == int.Parse(Eid)))
+                                    .ToList(),
+                onderzoekenTweede = onderzoekenActive
+                                    .Where(o => o.Ervaringsdeskundigen.Any(e => e.Id == int.Parse(Eid)))
+                                    .ToList(),
             };
 
 
@@ -349,10 +326,55 @@ namespace Accessibility_app.Controllers
 			return Ok(beperkingen);
 		}
 
+        [HttpPut("ervaringdiskundigen/{id}")]
+        public async Task<IActionResult> AddErvaringdeskundige(int id)
+        {
+            var onderzoek = await _context.Onderzoeken
+                .Include(o => o.Ervaringsdeskundigen)
+                .Where(o => o.Id == id)
+                .SingleOrDefaultAsync(); ;
+            var ervaringsdeskundigenModel = await _context.Onderzoeken
+             .Where(o => o.Id == id)
+             .Include(o => o.Ervaringsdeskundigen)
+             .Select(o => o.Ervaringsdeskundigen.Select(e => new deskundigeEmailDto
+             {
+                 Id = e.Id,
+                 Email = e.Email,
+             }).ToList())
+             .FirstOrDefaultAsync();
+            var ervaringsdekundigen = _context.Ervaringsdeskundigen.Where(a => ervaringsdeskundigenModel.Select(aa => aa.Id).Contains(a.Id)).ToList();
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var deskundige = await _context.Ervaringsdeskundigen.FindAsync(userId);
+            if (ervaringsdeskundigenModel.Any(e => e.Id == userId) && ervaringsdeskundigenModel != null)
+            {
+
+                onderzoek.Ervaringsdeskundigen.Clear();
+                ervaringsdekundigen.Remove(deskundige);
+               
+            }
+            else
+            {
+                ervaringsdekundigen.Add(deskundige);
+            }
+            onderzoek.Ervaringsdeskundigen = ervaringsdekundigen;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
+
+            return NoContent(); 
+        }
 
 
-		
-		[HttpPut("AkkordStatus/{id}")]
+
+
+
+        [HttpPut("AkkordStatus/{id}")]
         public async Task<IActionResult> AkkordStatus(int id)
         {
             var onderzoek = await _context.Onderzoeken.FindAsync(id);
@@ -367,7 +389,7 @@ namespace Accessibility_app.Controllers
                 throw;
             }
 
-            return NoContent(); // 成功更新，返回 NoContent
+            return NoContent(); 
         }
 
         [HttpPut("NietAkkordStatus/{id}")]
@@ -387,15 +409,28 @@ namespace Accessibility_app.Controllers
 
             return NoContent(); 
         }
-
+        [HttpGet("ervaringsdeskundigen")]
+        public async Task<IActionResult> getErvaringsdeskundgien() 
+        {
+            var ervaringsdeskundigen = await _context.Ervaringsdeskundigen.ToListAsync();
+            var erDto = ervaringsdeskundigen.Select(e => new deskundigeEmailDto
+            {
+                Id = e.Id,
+                Email = e.Email,
+            }).ToList();
+            
+            return Ok(erDto);
+        }
         [HttpPut("update/{id}")]
         public async Task<IActionResult> updateOnderzoek([FromBody] OnderzoekForm onderzoekUpdates, int id)
         {
             var onderzoek = await _context.Onderzoeken
                 .Include(o => o.Beperkingen)
+                .Include(o=>o.Ervaringsdeskundigen)
                 .Where(o=>o.Id == id)
                 .SingleOrDefaultAsync();
             var beperkingen = _context.Beperkingen.Where(a => onderzoekUpdates.Beperkingen.Select(aa => aa.Id).Contains(a.Id)).ToList();
+            var deelnemers = _context.Ervaringsdeskundigen.Where(a => onderzoekUpdates.Deelnemers.Select(aa => aa.Id).Contains(a.Id)).ToList();
             var typeOnderzoek = await _context.TypeOnderzoeken.FirstOrDefaultAsync(t => t.Naam == onderzoekUpdates.TypeOnderzoek);
             // Controleer of de email is gewijzigd
 
@@ -406,7 +441,9 @@ namespace Accessibility_app.Controllers
            onderzoek.TypeOnderzoek = typeOnderzoek;
            onderzoek.Beperkingen.Clear();
             onderzoek.Beperkingen = beperkingen;
-            
+            onderzoek.Ervaringsdeskundigen.Clear();
+            onderzoek.Ervaringsdeskundigen = deelnemers;
+
 
             try
             {

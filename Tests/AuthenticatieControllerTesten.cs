@@ -8,17 +8,30 @@ namespace backend_tests
 	using Accessibility_backend.Modellen.DTO;
 	using Microsoft.AspNetCore.Http;
 	using Microsoft.AspNetCore.Mvc.Routing;
+    using Accessibility_app.Data;
+    using Accessibility_app.Models;
+    using Accessibility_backend.Modellen.Extra;
+    using Microsoft.AspNetCore.Identity;
+	using Microsoft.Extensions.Configuration;
+    using NuGet.Common;
+    using System.IdentityModel.Tokens.Jwt;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
 
 	public class AuthenticatieControllerTesten
 	{
 		private Mock<IEmailSender> mockEmailer;
 		private Mock<IAuthenticatieService> mockAuthService;
-		private AuthenticatieController controller;
+        private Mock<Rol> mockrol;
+        private AuthenticatieController controller;
+
 		public AuthenticatieControllerTesten()
 		{
 			mockEmailer = new Mock<IEmailSender>();
 			mockAuthService = new Mock<IAuthenticatieService>();
-		}
+			mockrol = new Mock<Rol>();
+
+        }
 		[Fact]
 		public async void EmailVerzendenReturnsOk()
 		{
@@ -68,5 +81,31 @@ namespace backend_tests
 			Assert.Equal("Error", resultValue.Status);
 			Assert.Equal(404, notFoundResult.StatusCode);
 		}
-	}
+
+
+		[Fact]
+		public async Task LoginReturnsOk()
+		{
+			mockAuthService.Setup(x => x.Login(It.IsAny<LoginModel>())).ReturnsAsync(new OkObjectResult(new
+			{
+				token = "mockToken",
+				expiration = "mockValue",
+				roles = "userrole"
+			}));
+
+            controller = new AuthenticatieController(mockAuthService.Object, mockEmailer.Object);
+			var model = new LoginModel { Email = "test@example.com", Wachtwoord = "Qwe123@" };
+
+			//act
+			var result = await controller.Login(model);
+            var okResult = Assert.IsType<OkObjectResult>(result);
+
+            //assert
+            var resultValue = okResult.Value as dynamic;
+            Assert.Equal("mockToken", resultValue.token);
+            Assert.Equal("mockValue", resultValue.expiration);
+            Assert.Equal("userrole", resultValue.roles);
+   
+        }
+    }
 }

@@ -24,6 +24,8 @@ namespace Accessibility_backend.Modellen.Registreermodellen
         [Required(ErrorMessage = "Beperking is required")]
         public List<Beperking> Beperkingen { get; set; }
 
+        public List<deskundigeEmailDto> Deelnemers { get; set; } = new ();
+
 
 
     }

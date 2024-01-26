@@ -45,6 +45,7 @@ namespace Accessibility_backend.Services
             await _userManager.ConfirmEmailAsync(gebruiker, token);
             return new OkObjectResult("Geverifieerd! U kan dit venster sluiten.");
         }
+
         public async Task<IActionResult> Login(LoginModel model)
         {
             HttpContext? context = _httpContextAccessor.HttpContext;
@@ -63,10 +64,11 @@ namespace Accessibility_backend.Services
                 }
                 return new UnauthorizedObjectResult(new Response { Status = "Error", Message = "Verifieer email eerst!" });
             }
-            if (!await _userManager.CheckPasswordAsync(user, model.Wachtwoord))
+            if (!await _userManager.CheckPasswordAsync(user, model.Wachtwoord)) 
             {
                 return new BadRequestObjectResult(new Response { Status = "Error", Message = "Email/wachtwoord is incorrect" });
-            };
+            }
+            
 
             /*if (user != null && await _userManager.CheckPasswordAsync(user, model.Wachtwoord))
             {*/
@@ -105,6 +107,7 @@ namespace Accessibility_backend.Services
                 token = new JwtSecurityTokenHandler().WriteToken(token),
                 expiration = token.ValidTo,
                 roles = userRoles,
+                email = user.Email
             });
             /* }
              return Unauthorized();*/
