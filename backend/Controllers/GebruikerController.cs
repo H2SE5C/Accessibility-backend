@@ -20,7 +20,8 @@ namespace Accessibility_app.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IEmailSender _emailSender;
 
-        public GebruikerController(ApplicationDbContext applicationDbContext, IEmailSender emailSender) { 
+        public GebruikerController(ApplicationDbContext applicationDbContext, IEmailSender emailSender)
+        {
             _context = applicationDbContext;
             _emailSender = emailSender;
         }
@@ -47,8 +48,8 @@ namespace Accessibility_app.Controllers
         public async Task<IActionResult> GetGebruikers()
         {
             var id = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-			//misschien nog check als gebruikers lijst null is?
-			return Ok(await _context.Gebruikers.ToListAsync());
+            //misschien nog check als gebruikers lijst null is?
+            return Ok(await _context.Gebruikers.ToListAsync());
         }
 
         [HttpGet("ervaringsdeskundigen")]
@@ -56,6 +57,10 @@ namespace Accessibility_app.Controllers
         {
             var gebruikersMetAandoeningen = await _context.Ervaringsdeskundigen
                 .Include(e => e.Aandoeningen)
+                .Include(e => e.Hulpmiddelen)
+                .Include(e => e.Onderzoeken)
+                .ThenInclude(o => o.Bedrijf)
+                
                 .ToListAsync();
 
             var gebruikersMetAandoeningenDto = gebruikersMetAandoeningen
@@ -72,6 +77,17 @@ namespace Accessibility_app.Controllers
                     {
                         Id = a.Id,
                         Naam = a.Naam
+                    }).ToList(),
+                    Hulpmiddelen = e.Hulpmiddelen.Select(a => new HulpmiddelDto
+                    {
+                        Id = a.Id,
+                        Naam = a.Naam
+                    }).ToList(),
+                    Onderzoeken = e.Onderzoeken.Select(a => new OnderzoekDto
+                    {
+                        Id = a.Id,
+                        Titel = a.Titel,
+                        Bedrijf = a.Bedrijf.Bedrijfsnaam
                     }).ToList()
                 })
                 .ToList();
@@ -79,44 +95,11 @@ namespace Accessibility_app.Controllers
             return Ok(gebruikersMetAandoeningenDto);
         }
 
-        [HttpGet("ervaringsdeskundigen/filter")]
-        public async Task<IActionResult> GetErvaringsdeskundigenByBeperkingen([FromBody] List<int> beperkingIds)
-        {
-            var gebruikersMetAandoeningen = await _context.Ervaringsdeskundigen
-                .Include(e => e.Aandoeningen)
-                .ToListAsync();
-
-            var gebruikersMetGewensteBeperkingen = gebruikersMetAandoeningen
-                .Where(e => e.Aandoeningen.Any(a => beperkingIds.Contains(a.BeperkingId)))
-                .ToList();
-
-            var gebruikersMetGewensteBeperkingenDto = gebruikersMetGewensteBeperkingen
-                .Select(e => new ErvaringsdeskundigeDto
-                {
-                    Id = e.Id,
-                    Voornaam = e.Voornaam,
-                    Achternaam = e.Achternaam,
-                    Email = e.Email,
-                    PhoneNumber = e.PhoneNumber,
-                    Postcode = e.Postcode,
-                    VoorkeurBenadering = e.VoorkeurBenadering,
-                    Aandoeningen = e.Aandoeningen.Select(a => new AandoeningDto
-                    {
-                        Id = a.Id,
-                        Naam = a.Naam
-                    }).ToList()
-                })
-                .ToList();
-
-            return Ok(gebruikersMetGewensteBeperkingenDto);
-        }
-
-
 
         [HttpGet("bedrijven")]
         public async Task<IActionResult> GetAllesBedrijf()
         {
-            var bedrijven = await _context.Bedrijven.Where(b=>b.EmailConfirmed == true).ToListAsync();
+            var bedrijven = await _context.Bedrijven.Where(b => b.EmailConfirmed == true).ToListAsync();
             var bedrijvenAfwachting = await _context.Bedrijven.Where(b => b.EmailConfirmed == false).ToListAsync();
 
             var response = new BedrijvenResponse
@@ -138,15 +121,15 @@ namespace Accessibility_app.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-			var gebruiker = await _context.Gebruikers.Where(g => g.Id == id).FirstAsync();
+            var gebruiker = await _context.Gebruikers.Where(g => g.Id == id).FirstAsync();
 
-			if (gebruiker != null)
-			{
-				return Ok(gebruiker);
-			}
+            if (gebruiker != null)
+            {
+                return Ok(gebruiker);
+            }
 
-			return NotFound();
-		}
+            return NotFound();
+        }
 
         /* POST api/<GebruikerController>
         voorbeeld request: 
@@ -155,43 +138,43 @@ namespace Accessibility_app.Controllers
                 "wachtwoord": "string",
                 "rol": "admin"
             }*/
-	/*[HttpPost]
-        public async Task<IActionResult> MaakGebruikerAan([FromBody] Gebruiker gebruiker)
-        {
-            var nieuweGebruiker = new Gebruiker()
+        /*[HttpPost]
+            public async Task<IActionResult> MaakGebruikerAan([FromBody] Gebruiker gebruiker)
             {
-               Email = gebruiker.Email,
-               Wachtwoord = gebruiker.Wachtwoord,
-               Geverifieerd = true,
-            };
+                var nieuweGebruiker = new Gebruiker()
+                {
+                   Email = gebruiker.Email,
+                   Wachtwoord = gebruiker.Wachtwoord,
+                   Geverifieerd = true,
+                };
 
-            await _context.Gebruikers.AddAsync(nieuweGebruiker);
-            await _context.SaveChangesAsync();
+                await _context.Gebruikers.AddAsync(nieuweGebruiker);
+                await _context.SaveChangesAsync();
 
-            return Ok(nieuweGebruiker);
-        }*/
+                return Ok(nieuweGebruiker);
+            }*/
 
         // PUT api/<GebruikerController>/5
-       /* [HttpPut("{id}")]
-        public async Task<IActionResult> VeranderGegevens(int id, [FromBody] Gebruiker upgedateGebruiker)
-        {
-            var gebruiker = await _context.Gebruikers.FindAsync(id);
+        /* [HttpPut("{id}")]
+         public async Task<IActionResult> VeranderGegevens(int id, [FromBody] Gebruiker upgedateGebruiker)
+         {
+             var gebruiker = await _context.Gebruikers.FindAsync(id);
 
-            if (gebruiker != null) { 
-                gebruiker.Email = upgedateGebruiker.Email;
-                gebruiker.Wachtwoord = upgedateGebruiker.Wachtwoord;
-				await _context.SaveChangesAsync();
-                return Ok(gebruiker);
-			}
+             if (gebruiker != null) { 
+                 gebruiker.Email = upgedateGebruiker.Email;
+                 gebruiker.Wachtwoord = upgedateGebruiker.Wachtwoord;
+                 await _context.SaveChangesAsync();
+                 return Ok(gebruiker);
+             }
 
-            return NotFound();
-        }
-*/
+             return NotFound();
+         }
+ */
         // DELETE api/<GebruikerController>/5
         [HttpDelete("{id}")]
-		public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-			
+
             try
             {
                 var gebruiker = await _context.Gebruikers.FindAsync(id);
@@ -204,6 +187,6 @@ namespace Accessibility_app.Controllers
             }
 
             return NotFound();
-		}
+        }
     }
 }

@@ -295,7 +295,7 @@ namespace Accessibility_backend.Services
                 LinkNaarBedrijf = model.LinkNaarBedrijf,
                 Email = model.Email,
                 Rol = rol,
-                EmailConfirmed = true
+                EmailConfirmed = false
             };
 
             var result = await _userManager.CreateAsync(bedrijf, model.Wachtwoord);
