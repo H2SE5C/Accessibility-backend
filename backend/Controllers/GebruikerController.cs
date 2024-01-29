@@ -2,6 +2,7 @@
 using Accessibility_app.Models;
 using Accessibility_backend;
 using Accessibility_backend.Modellen.DTO;
+using Accessibility_backend.Modellen.Registreermodellen;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -51,11 +52,66 @@ namespace Accessibility_app.Controllers
         }
 
         [HttpGet("ervaringsdeskundigen")]
-        public async Task<IActionResult> GetAllesErvaringsdeskundigen()
+        public async Task<IActionResult> GetErvaringsdeskundigen()
         {
-            var ervaringsdeskundigen = await _context.Ervaringsdeskundigen.ToListAsync();
-            return Ok(ervaringsdeskundigen);
+            var gebruikersMetAandoeningen = await _context.Ervaringsdeskundigen
+                .Include(e => e.Aandoeningen)
+                .ToListAsync();
+
+            var gebruikersMetAandoeningenDto = gebruikersMetAandoeningen
+                .Select(e => new ErvaringsdeskundigeDto
+                {
+                    Id = e.Id,
+                    Voornaam = e.Voornaam,
+                    Achternaam = e.Achternaam,
+                    Email = e.Email,
+                    PhoneNumber = e.PhoneNumber,
+                    Postcode = e.Postcode,
+                    VoorkeurBenadering = e.VoorkeurBenadering,
+                    Aandoeningen = e.Aandoeningen.Select(a => new AandoeningDto
+                    {
+                        Id = a.Id,
+                        Naam = a.Naam
+                    }).ToList()
+                })
+                .ToList();
+
+            return Ok(gebruikersMetAandoeningenDto);
         }
+
+        [HttpGet("ervaringsdeskundigen/filter")]
+        public async Task<IActionResult> GetErvaringsdeskundigenByBeperkingen([FromBody] List<int> beperkingIds)
+        {
+            var gebruikersMetAandoeningen = await _context.Ervaringsdeskundigen
+                .Include(e => e.Aandoeningen)
+                .ToListAsync();
+
+            var gebruikersMetGewensteBeperkingen = gebruikersMetAandoeningen
+                .Where(e => e.Aandoeningen.Any(a => beperkingIds.Contains(a.BeperkingId)))
+                .ToList();
+
+            var gebruikersMetGewensteBeperkingenDto = gebruikersMetGewensteBeperkingen
+                .Select(e => new ErvaringsdeskundigeDto
+                {
+                    Id = e.Id,
+                    Voornaam = e.Voornaam,
+                    Achternaam = e.Achternaam,
+                    Email = e.Email,
+                    PhoneNumber = e.PhoneNumber,
+                    Postcode = e.Postcode,
+                    VoorkeurBenadering = e.VoorkeurBenadering,
+                    Aandoeningen = e.Aandoeningen.Select(a => new AandoeningDto
+                    {
+                        Id = a.Id,
+                        Naam = a.Naam
+                    }).ToList()
+                })
+                .ToList();
+
+            return Ok(gebruikersMetGewensteBeperkingenDto);
+        }
+
+
 
         [HttpGet("bedrijven")]
         public async Task<IActionResult> GetAllesBedrijf()
