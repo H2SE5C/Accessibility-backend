@@ -6,7 +6,10 @@ namespace Accessibility_app.Models
 	[Table("Vraag")]
 	public class Vraag
     {
-		public int Id { get; set; }
+        internal readonly int? VragenlijstId;
+
+        public int Id { get; set; }
 		public string VraagTekst { get; set; }
+        public object Vragenlijst { get; internal set; }
     }
 }

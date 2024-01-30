@@ -440,9 +440,9 @@ namespace Accessibility_app.Controllers
            onderzoek.Datum = (DateTime)onderzoekUpdates.Datum;
            onderzoek.TypeOnderzoek = typeOnderzoek;
            onderzoek.Beperkingen.Clear();
-            onderzoek.Beperkingen = beperkingen;
-            onderzoek.Ervaringsdeskundigen.Clear();
-            onderzoek.Ervaringsdeskundigen = deelnemers;
+           onderzoek.Beperkingen = beperkingen;
+           onderzoek.Ervaringsdeskundigen.Clear();
+           onderzoek.Ervaringsdeskundigen = deelnemers;
 
 
             try
