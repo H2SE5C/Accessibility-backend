@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Accessibility_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240121212527_AccessibilityDB")]
-    partial class AccessibilityDB
+    [Migration("20240130161150_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

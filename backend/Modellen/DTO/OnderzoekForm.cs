@@ -11,7 +11,6 @@ namespace Accessibility_backend.Modellen.Registreermodellen
         [Required(ErrorMessage = "Omschrijving is required")]
         public string? Omschrijving { get; set; }
 
-
         [Required(ErrorMessage = "Beloning is required")]
         public string? Beloning { get; set; }
 
@@ -25,8 +24,5 @@ namespace Accessibility_backend.Modellen.Registreermodellen
         public List<Beperking> Beperkingen { get; set; }
 
         public List<deskundigeEmailDto> Deelnemers { get; set; } = new ();
-
-
-
     }
 }
