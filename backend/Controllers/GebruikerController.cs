@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
 using System.Security.Claims;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -95,20 +96,218 @@ namespace Accessibility_app.Controllers
             return Ok(gebruikersMetAandoeningenDto);
         }
 
-
         [HttpGet("bedrijven")]
         public async Task<IActionResult> GetAllesBedrijf()
         {
-            var bedrijven = await _context.Bedrijven.Where(b => b.EmailConfirmed == true).ToListAsync();
-            var bedrijvenAfwachting = await _context.Bedrijven.Where(b => b.EmailConfirmed == false).ToListAsync();
+            var bedrijvenTrue = await _context.Bedrijven
+                .Include(b => b.BedrijfsOnderzoekslijst)
+                .Where(b => b.EmailConfirmed == true)
+                .Select(b => new BedrijfDto
+                {
+                    Id = b.Id,
+                    Bedrijfsnaam = b.Bedrijfsnaam,
+                    Omschrijving = b.Omschrijving,
+                    Email = b.Email,
+                    EmailConfirmed = b.EmailConfirmed,
+                    PhoneNumber = b.PhoneNumber,
+                    Locatie = b.Locatie,
+                    LinkNaarBedrijf = b.LinkNaarBedrijf,
+                    BedrijfsOnderzoekslijst = b.BedrijfsOnderzoekslijst.Select(o => new OnderzoekDto
+                    {
+                        Id = o.Id,
+                        Titel = o.Titel,
+                        Omschrijving = o.Omschrijving,
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            var bedrijvenFalse = await _context.Bedrijven
+                .Include(b => b.BedrijfsOnderzoekslijst)
+                .Where(b => b.EmailConfirmed == false)
+                .Select(b => new BedrijfDto
+                {
+                    Id = b.Id,
+                    Bedrijfsnaam = b.Bedrijfsnaam,
+                    Omschrijving = b.Omschrijving,
+                    Email = b.Email,
+                    EmailConfirmed = b.EmailConfirmed,
+                    PhoneNumber = b.PhoneNumber,
+                    Locatie = b.Locatie,
+                    LinkNaarBedrijf = b.LinkNaarBedrijf,
+                    BedrijfsOnderzoekslijst = b.BedrijfsOnderzoekslijst.Select(o => new OnderzoekDto
+                    {
+                        Id = o.Id,
+                        Titel = o.Titel,
+                        Omschrijving = o.Omschrijving,
+                    }).ToList()
+                })
+                .ToListAsync();
 
             var response = new BedrijvenResponse
             {
-                bedrijvenTrue = bedrijven,
-                bedrijvenFalse = bedrijvenAfwachting,
+                bedrijvenTrue = bedrijvenTrue,
+                bedrijvenFalse = bedrijvenFalse,
             };
             return Ok(response);
         }
+
+        [HttpGet("onderzoeken")]
+        public async Task<IActionResult> GetOnderzoekenStatus()
+        {
+            var onderzoeken = new ArrayList();
+            var onderzoekenGoedgekeurd = await _context.Onderzoeken
+                .Include(o => o.Bedrijf)
+                .Include(o => o.TypeOnderzoek)
+                .Where(o => o.Status != "In afwachting")
+                .Select(o => new OnderzoekDto
+                {
+                    Id = o.Id,
+                    Titel = o.Titel,
+                    Omschrijving = o.Omschrijving,
+                    Vragenlijst = o.Vragenlijst.Id,
+                    Beloning = o.Beloning,
+                    Status = o.Status,
+                    Bedrijf = o.Bedrijf.Bedrijfsnaam,
+                    Datum = o.Datum,
+                    Ervaringsdeskundigen = o.Ervaringsdeskundigen.Select(e => new deskundigeEmailDto
+                    {
+                        Id = e.Id,
+                        Email = e.Email,
+                    }).ToList(),
+                    Beperkingen = o.Beperkingen.Select(b => new BeperkingDto
+                    {
+                        Id = b.Id,
+                        Naam = b.Naam
+                    }).ToList(),
+                    TypeOnderzoek = o.TypeOnderzoek.Naam
+                })
+                .ToListAsync();
+
+            var onderzoekenAnderen = await _context.Onderzoeken
+                .Include(o => o.Bedrijf)
+                .Include(o => o.TypeOnderzoek)
+                .Where(o => o.Status == "In afwachting")
+                .Select(o => new OnderzoekDto
+                {
+                    Id = o.Id,
+                    Titel = o.Titel,
+                    Omschrijving = o.Omschrijving,
+                    Vragenlijst = o.Vragenlijst.Id,
+                    Beloning = o.Beloning,
+                    Status = o.Status,
+                    Bedrijf = o.Bedrijf.Bedrijfsnaam,
+                    Datum = o.Datum,
+                    Ervaringsdeskundigen = o.Ervaringsdeskundigen.Select(e => new deskundigeEmailDto
+                    {
+                        Id = e.Id,
+                        Email = e.Email,
+                    }).ToList(),
+                    Beperkingen = o.Beperkingen.Select(b => new BeperkingDto
+                    {
+                        Id = b.Id,
+                        Naam = b.Naam
+                    }).ToList(),
+                    TypeOnderzoek = o.TypeOnderzoek.Naam
+                })
+                .ToListAsync();
+
+            var response = new OnderzoekenResponse
+            {
+                onderzoekenEerste = onderzoekenGoedgekeurd,
+                onderzoekenTweede = onderzoekenAnderen
+            };
+
+
+            return Ok(response);
+        }
+
+        [HttpGet("onderzoeken/{id}")]
+        public async Task<IActionResult> GetOnderzoekId(int id)
+        {
+            var onderzoek = await _context.Onderzoeken
+               .Include(o => o.Bedrijf)
+               .Include(o => o.TypeOnderzoek)
+               .Where(o => o.Id == id)
+               .Select(o => new OnderzoekDto
+               {
+                   Id = o.Id,
+                   Titel = o.Titel,
+                   Omschrijving = o.Omschrijving,
+                   Vragenlijst = o.Vragenlijst.Id,
+                   Beloning = o.Beloning,
+                   Status = o.Status,
+                   Bedrijf = o.Bedrijf.Bedrijfsnaam,
+                   Datum = o.Datum,
+                   Ervaringsdeskundigen = o.Ervaringsdeskundigen.Select(e => new deskundigeEmailDto
+                   {
+                       Id = e.Id,
+                       Email = e.Email,
+                   }).ToList(),
+                   Beperkingen = o.Beperkingen.Select(b => new BeperkingDto
+                   {
+                       Id = b.Id,
+                       Naam = b.Naam
+                   }).ToList(),
+                   TypeOnderzoek = o.TypeOnderzoek.Naam
+               })
+               .FirstAsync();
+
+            return Ok(onderzoek);
+        }
+
+        [HttpPut("onderzoeken/AkkoordStatus/{id}")]
+        public async Task<IActionResult> AkkordStatus(int id)
+        {
+            var onderzoek = await _context.Onderzoeken.FindAsync(id);
+            onderzoek.Status = "Actief";
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
+
+            return NoContent();
+        }
+
+        [HttpPut("onderzoeken/NietAkkoordStatus/{id}")]
+        public async Task<IActionResult> NietAkkordStatus(int id)
+        {
+            var onderzoek = await _context.Onderzoeken.FindAsync(id);
+            onderzoek.Status = "Afgekeurd";
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("onderzoeken/verwijderen/{id}")]
+        public async Task<IActionResult> VerwijderOnderzoek(int id)
+        {
+            try
+            {
+                var onderzoek = await _context.Onderzoeken.FindAsync(id);
+                _context.Onderzoeken.Remove(onderzoek);
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                throw new Exception("niet gelukkig");
+            }
+            return Ok(id);
+        }
+
+
         [HttpGet("medewerkers")]
         public async Task<IActionResult> GetAllesMedewerker()
         {
