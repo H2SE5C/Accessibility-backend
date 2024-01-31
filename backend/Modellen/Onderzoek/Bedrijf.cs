@@ -10,6 +10,7 @@ namespace Accessibility_app.Models
         public string Omschrijving { get; set; }
         public string Locatie { get; set; }
         public string LinkNaarBedrijf { get; set; }
+        public bool EmailConfirmed { get; set; }
         public List<Onderzoek> BedrijfsOnderzoekslijst { get; set; } = new();
 
     }
