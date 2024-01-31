@@ -31,7 +31,7 @@ namespace Accessibility_app.Controllers
         [HttpPut("bedrijf/{id}")]
         public async Task<IActionResult> setEmailTrue(int id)
         {
-            var bedrijf = await _context.Bedrijven.FindAsync(id);
+            var bedrijf = await _context.Gebruikers.FindAsync(id);
             bedrijf.EmailConfirmed = true;
             await _context.SaveChangesAsync();
             var result = await _emailSender.SendEmailAsync(bedrijf.Email, "Verifieer email - Accessibility", "Uw bedrijf account is actief");
@@ -150,6 +150,7 @@ namespace Accessibility_app.Controllers
             };
             return Ok(response);
         }
+
 
         [HttpGet("onderzoeken")]
         public async Task<IActionResult> GetOnderzoekenStatus()
@@ -385,7 +386,7 @@ namespace Accessibility_app.Controllers
                 throw new Exception("niet gelukkig");
             }
 
-            return NotFound();
+            return Ok(id);
         }
     }
 }
